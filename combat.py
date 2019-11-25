@@ -58,6 +58,10 @@ def beginCombat(enemyFormation):
     start_ticks = pygame.time.get_ticks()
     continueFight = True
     cfg.screen.fill((160,160,160))
+
+    # selectedCell represents where the player is currently targeting
+    # 1 represents top left, 2 is top right, 3 is bottom left, 4 is bottom right
+    selectedCell = 1
     while continueFight:
         curTime = pygame.time.get_ticks()
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
@@ -67,6 +71,30 @@ def beginCombat(enemyFormation):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 continueFight = False
+
+            # cell targeting selection by the player
+            # if the player moves towards the edge, wrap
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    if selectedCell == 1 or selectedCell == 3:
+                        selectedCell += 1
+                    else:
+                        selectedCell -= 1
+                elif event.key == pygame.K_LEFT:
+                    if selectedCell == 2 or selectedCell == 4:
+                        selectedCell -= 1
+                    else:
+                        selectedCell += 1
+                elif event.key == pygame.K_DOWN:
+                    if selectedCell == 1 or selectedCell == 2:
+                        selectedCell += 2
+                    else:
+                        selectedCell -= 2
+                elif event.key == pygame.K_UP:
+                    if selectedCell == 3 or selectedCell == 4:
+                        selectedCell -= 2
+                    else:
+                        selectedCell += 2
 
         # each enemy starts with lastAttacked = -1.0
         # start their attack cycle once we are in the gaem loop
