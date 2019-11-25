@@ -39,8 +39,9 @@ def beginCombat(enemyFormation):
             if name == "Samurai":
                 speed = 0.75
                 dmg = 10
-                ss = spritesheet.spritesheet('enemyTemp.png')
-                sprite = ss.image_at((0,0,15,30))
+                #ss = spritesheet.spritesheet('enemyTemp.png')
+                #sprite = ss.image_at((0,0,15,30))
+                sprite = cfg.headbutt_img
                 sprite = pygame.transform.scale(sprite, (75, 100))
             # adjust the enemy's location based on it's image
             # so it's location will be centered to the center of the actual sprite
