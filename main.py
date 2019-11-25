@@ -1,21 +1,29 @@
+import random
 import pygame
+import spritesheet
+import combat
+import config as cfg
 
-pygame.init()
+# game handler
 
-screen = pygame.display.set_mode((800, 600))
+def main():
+    pygame.init()
 
-# title and icon
-pygame.display.set_caption("Kung Fu Escape")
+    # title and icon
+    pygame.display.set_caption("Kung Fu Escape")
 
+    # main loop
+    keepGoing = True
+    while keepGoing:
+        cfg.screen.fill((0,0,0))
+        enemyFormation = random.choice(cfg.enemyFormations)
 
-# main loop
-keepGoing = True
-while keepGoing:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            keepGoing = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                keepGoing = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_f:
+                    combat.beginCombat(enemyFormation)
 
-    screen.fill((0,0,0))
-
-
-    pygame.display.update()
+if __name__ == "__main__":
+    main()
