@@ -7,8 +7,8 @@ import enemy
 # enemyFormation is a list of strings representing the enemy formation beginning the fight
 # "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
 def beginCombat(enemyFormation):
-    ss = spritesheet.spritesheet('playerTemp.png')
-    player_image = ss.image_at((50, 10, 35, 35))
+    #ss = spritesheet.spritesheet('playerTemp.png')
+    #player_image = ss.image_at((50, 10, 35, 35))
     playerX = 370
     playerY = 480
 
@@ -66,7 +66,7 @@ def beginCombat(enemyFormation):
         curTime = pygame.time.get_ticks()
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
 
-        cfg.screen.blit(player_image, (playerX, playerY))
+        cfg.screen.blit(cfg.punch_img, (playerX, playerY))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
