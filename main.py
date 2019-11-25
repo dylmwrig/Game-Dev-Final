@@ -16,14 +16,15 @@ def main():
     keepGoing = True
     while keepGoing:
         cfg.screen.fill((0,0,0))
-        enemyFormation = random.choice(cfg.enemyFormations)
+        enemyFormation = random.choice(cfg.simpleEnemyFormations)
+        combat.beginCombat(enemyFormation)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 keepGoing = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_f:
-                    combat.beginCombat(enemyFormation)
+                    print("pepeLaugh")
 
 if __name__ == "__main__":
     main()
