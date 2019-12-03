@@ -1,20 +1,16 @@
 import pygame
 import spritesheet
 import config as cfg
-import enemy
+import player as player_class
+import enemy as enemy_class
 
-# basic fight loop
-# enemyFormation is a list of strings representing the enemy formation beginning the fight
-# "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
-def beginCombat(enemyFormation):
-    #ss = spritesheet.spritesheet('playerTemp.png')
-    #player_image = ss.image_at((50, 10, 35, 35))
-    playerX = 370
-    playerY = 480
+#def playerTakeAction(action):
 
-    # four element list holding each enemy
-    # first element corresponds to enemy in top left cell, second to top right, and so on
-    # empty cells are represented by None and will just be skipped in the combat loop
+
+# four element list holding each enemy
+# first element corresponds to enemy in top left cell, second to top right, and so on
+# empty cells are represented by None and will just be skipped in the combat loop
+def createEnemies(enemyFormation):
     enemies = []
     for i, name in enumerate(enemyFormation):
         if name == "":
@@ -39,6 +35,7 @@ def beginCombat(enemyFormation):
             if name == "Samurai":
                 speed = 0.75
                 dmg = 10
+                health = 100
                 #ss = spritesheet.spritesheet('enemyTemp.png')
                 #sprite = ss.image_at((0,0,15,30))
                 sprite = cfg.headbutt_img
@@ -48,9 +45,20 @@ def beginCombat(enemyFormation):
             x -= sprite.get_rect().width / 2
             y -= sprite.get_rect().height / 2
 
-            enemies.append(enemy.Enemy(name, x, y, dmg, speed, -1.0, sprite))
+            enemies.append(enemy_class.Enemy(name, health, x, y, dmg, speed, -1.0, sprite))
+    return enemies
 
-    player_action =
+# basic fight loop
+# enemyFormation is a list of strings representing the enemy formation beginning the fight
+# "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
+def beginCombat(enemyFormation):
+    #ss = spritesheet.spritesheet('playerTemp.png')
+    #player_image = ss.image_at((50, 10, 35, 35))
+    playerX = 370
+    playerY = 480
+
+    player = player_class.Player(100, 0)
+    enemies = createEnemies(enemyFormation)
 
     CURSOR_BLIT_SPEED = 300
     cellOne = pygame.Rect(0, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
@@ -77,20 +85,12 @@ def beginCombat(enemyFormation):
 
         # display targeting reticle
         if ((curTime - cursor_last_blit) > CURSOR_BLIT_SPEED):
-            print("curTime: " + str(curTime))
-            print("last blit: " + str(cursor_last_blit))
-            print("blit speed: " + str(CURSOR_BLIT_SPEED))
             if (not cursor_drawn):
                 cursor_last_blit = pygame.time.get_ticks()
                 cursor_drawn = True
             else:
                 cursor_last_blit = pygame.time.get_ticks()
                 cursor_drawn = False
-
-#        print(quadrants[selectedCell].topleft)
-#        print(quadrants[selectedCell].topright)
-#        print(quadrants[selectedCell].bottomleft)
-#        print(quadrants[selectedCell].bottomright)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -121,11 +121,29 @@ def beginCombat(enemyFormation):
                     else:
                         selectedCell += 2
 
+                if event.key == pygame.K_a:
+                    player.takeAction("punch")
+                elif event.key == pygame.K_s:
+                    player.takeAction("kick")
+                elif event.key == pygame.K_d:
+                    player.takeAction("headbutt")
+                elif event.key == pygame.K_SPACE:
+                    player.takeAction("defend")
+
         if (cursor_drawn):
             cfg.screen.blit(cfg.punch_img, quadrants[selectedCell])
 
+        # player actions
+        if ((curTime - player.lastAttacked) > player.speed):
+            print("Attacked cell " + str(selectedCell))
+            print("last attacked: " + str(player.lastAttacked))
+            if (enemies[selectedCell] != None):
+                print(enemies[selectedCell].name)
+            else:
+                print("Whiff!")
+
         # each enemy starts with lastAttacked = -1.0
-        # start their attack cycle once we are in the gaem loop
+        # start their attack cycle once we are in the game loop
         # afterwards, check if curTime - lastAttacked >= speed; if it is, update lastAttacked with curTime and attack
         for i, e in enumerate(enemies):
             if e != None:

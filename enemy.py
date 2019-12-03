@@ -3,8 +3,9 @@
 # lastAttacked is a float; update whenever the enemy attacks
 # sprite is already extracted from the sprite sheet
 class Enemy:
-    def __init__(self, name, xPos, yPos, damage, speed, lastAttacked, sprite):
+    def __init__(self, name, health, xPos, yPos, damage, speed, lastAttacked, sprite):
         self.name = name
+        self.health = health
         self.xPos = xPos
         self.yPos = yPos
         self.damage = damage
