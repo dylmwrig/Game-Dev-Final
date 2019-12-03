@@ -13,15 +13,14 @@ def main():
     pygame.display.set_caption("Kung Fu Escape")
 
     # main loop
-    keepGoing = True
-    while keepGoing:
+    while cfg.RUN_GAME:
         cfg.screen.fill((0,0,0))
         enemyFormation = random.choice(cfg.simpleEnemyFormations)
         combat.beginCombat(enemyFormation)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                keepGoing = False
+                cfg.RUN_GAME = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_f:
                     print("pepeLaugh")

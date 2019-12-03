@@ -61,38 +61,47 @@ def beginCombat(enemyFormation):
     cfg.screen.fill((160,160,160))
 
     # selectedCell represents where the player is currently targeting
-    # 1 represents top left, 2 is top right, 3 is bottom left, 4 is bottom right
-    selectedCell = 1
+    # 0 represents top left, 1 is top right, 2 is bottom left, 3 is bottom right
+    selectedCell = 0
     while continueFight:
         curTime = pygame.time.get_ticks()
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
 
-        cfg.screen.blit(cfg.punch_img, (playerX, playerY))
+        cfg.screen.fill((255,255,255));
+
+        # display targeting reticle
+        cfg.screen.blit(cfg.punch_img, quadrants[selectedCell])
+
+        print(quadrants[selectedCell].topleft)
+        print(quadrants[selectedCell].topright)
+        print(quadrants[selectedCell].bottomleft)
+        print(quadrants[selectedCell].bottomright)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 continueFight = False
+                cfg.RUN_GAME = False
 
             # cell targeting selection by the player
             # if the player moves towards the edge, wrap
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
-                    if selectedCell == 1 or selectedCell == 3:
+                    if selectedCell == 0 or selectedCell == 2:
                         selectedCell += 1
                     else:
                         selectedCell -= 1
                 elif event.key == pygame.K_LEFT:
-                    if selectedCell == 2 or selectedCell == 4:
+                    if selectedCell == 1 or selectedCell == 3:
                         selectedCell -= 1
                     else:
                         selectedCell += 1
                 elif event.key == pygame.K_DOWN:
-                    if selectedCell == 1 or selectedCell == 2:
+                    if selectedCell == 0 or selectedCell == 1:
                         selectedCell += 2
                     else:
                         selectedCell -= 2
                 elif event.key == pygame.K_UP:
-                    if selectedCell == 3 or selectedCell == 4:
+                    if selectedCell == 2 or selectedCell == 3:
                         selectedCell -= 2
                     else:
                         selectedCell += 2
@@ -106,7 +115,6 @@ def beginCombat(enemyFormation):
                     e.lastAttacked = curTime
                 elif (curTime - e.lastAttacked >= e.speed):
                     #TODO ATTACK
-                    cfg.screen.fill((255, 0, 0), quadrants[i])
                     e.lastAttacked = curTime
 
                 cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
