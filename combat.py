@@ -50,6 +50,9 @@ def beginCombat(enemyFormation):
 
             enemies.append(enemy.Enemy(name, x, y, dmg, speed, -1.0, sprite))
 
+    player_action =
+
+    CURSOR_BLIT_SPEED = 300
     cellOne = pygame.Rect(0, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
     cellTwo = pygame.Rect(cfg.CANVAS_WIDTH / 2, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
     cellThree = pygame.Rect(0, cfg.CANVAS_HEIGHT / 2, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
@@ -57,6 +60,9 @@ def beginCombat(enemyFormation):
     quadrants = [cellOne, cellTwo, cellThree, cellFour]
 
     start_ticks = pygame.time.get_ticks()
+    cursor_last_blit = start_ticks
+    cursor_drawn = False
+
     continueFight = True
     cfg.screen.fill((160,160,160))
 
@@ -70,12 +76,21 @@ def beginCombat(enemyFormation):
         cfg.screen.fill((255,255,255));
 
         # display targeting reticle
-        cfg.screen.blit(cfg.punch_img, quadrants[selectedCell])
+        if ((curTime - cursor_last_blit) > CURSOR_BLIT_SPEED):
+            print("curTime: " + str(curTime))
+            print("last blit: " + str(cursor_last_blit))
+            print("blit speed: " + str(CURSOR_BLIT_SPEED))
+            if (not cursor_drawn):
+                cursor_last_blit = pygame.time.get_ticks()
+                cursor_drawn = True
+            else:
+                cursor_last_blit = pygame.time.get_ticks()
+                cursor_drawn = False
 
-        print(quadrants[selectedCell].topleft)
-        print(quadrants[selectedCell].topright)
-        print(quadrants[selectedCell].bottomleft)
-        print(quadrants[selectedCell].bottomright)
+#        print(quadrants[selectedCell].topleft)
+#        print(quadrants[selectedCell].topright)
+#        print(quadrants[selectedCell].bottomleft)
+#        print(quadrants[selectedCell].bottomright)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -105,6 +120,9 @@ def beginCombat(enemyFormation):
                         selectedCell -= 2
                     else:
                         selectedCell += 2
+
+        if (cursor_drawn):
+            cfg.screen.blit(cfg.punch_img, quadrants[selectedCell])
 
         # each enemy starts with lastAttacked = -1.0
         # start their attack cycle once we are in the gaem loop

@@ -1,6 +1,7 @@
 import pygame
 import os
 
+# general game stuff
 CANVAS_HEIGHT = 600
 CANVAS_WIDTH = 800
 RUN_GAME = True
