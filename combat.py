@@ -1,5 +1,6 @@
 import pygame
 import spritesheet
+import loadAssets as assets
 import config as cfg
 import player as player_class
 import enemy as enemy_class
@@ -33,12 +34,12 @@ def createEnemies(enemyFormation):
                 y = cfg.CANVAS_HEIGHT * (3/4)
 
             if name == "Samurai":
-                speed = 0.75
-                dmg = 10
+                speed = 1500
+                dmg = 15
                 health = 100
                 #ss = spritesheet.spritesheet('enemyTemp.png')
                 #sprite = ss.image_at((0,0,15,30))
-                sprite = cfg.headbutt_img
+                sprite = assets.headbutt_img
                 sprite = pygame.transform.scale(sprite, (75, 100))
             # adjust the enemy's location based on it's image
             # so it's location will be centered to the center of the actual sprite
@@ -84,8 +85,8 @@ def beginCombat(enemyFormation):
         cfg.screen.fill((255,255,255));
 
         # display targeting reticle
-        if ((curTime - cursor_last_blit) > CURSOR_BLIT_SPEED):
-            if (not cursor_drawn):
+        if (curTime - cursor_last_blit) > CURSOR_BLIT_SPEED:
+            if not cursor_drawn:
                 cursor_last_blit = pygame.time.get_ticks()
                 cursor_drawn = True
             else:
@@ -130,28 +131,34 @@ def beginCombat(enemyFormation):
                 elif event.key == pygame.K_SPACE:
                     player.takeAction("defend")
 
-        if (cursor_drawn):
-            cfg.screen.blit(cfg.punch_img, quadrants[selectedCell])
+        if cursor_drawn:
+            cfg.screen.blit(assets.punch_img, quadrants[selectedCell])
 
         # player actions
-        if ((curTime - player.lastAttacked) > player.speed):
-            print("Attacked cell " + str(selectedCell))
-            print("last attacked: " + str(player.lastAttacked))
-            if (enemies[selectedCell] != None):
+        if (curTime - player.lastAttacked) > player.speed:
+            if enemies[selectedCell] is not None:
+                enemies[selectedCell].health -= player.damage
                 print(enemies[selectedCell].name)
+                print(enemies[selectedCell].health)
+                if enemies[selectedCell].health <= 0:
+                    enemies[selectedCell] = None
             else:
                 print("Whiff!")
+            player.lastAttacked = pygame.time.get_ticks()
 
         # each enemy starts with lastAttacked = -1.0
         # start their attack cycle once we are in the game loop
         # afterwards, check if curTime - lastAttacked >= speed; if it is, update lastAttacked with curTime and attack
         for i, e in enumerate(enemies):
-            if e != None:
+            if e is not None:
                 if e.lastAttacked == -1.0:
                     e.lastAttacked = curTime
-                elif (curTime - e.lastAttacked >= e.speed):
-                    #TODO ATTACK
+                elif curTime - e.lastAttacked >= e.speed:
                     e.lastAttacked = curTime
+                    if player.action == "blocking":
+                        print("blocked!")
+                    else:
+                        player.health -= e.damage
 
                 cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
 

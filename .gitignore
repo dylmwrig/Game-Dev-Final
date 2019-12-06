@@ -1,6 +1,5 @@
 tempAssets/*
 *Temp.png
 venv/
-# config.py is in here because directories are different between my workspaces
-# maybe I can find a better workaround for this but that's low priority, configuring config manually should be ok
-config.py
+# load in files from different loadAssets files to avoid directory problems on diff machines
+loadAssets.py

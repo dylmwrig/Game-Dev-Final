@@ -7,12 +7,6 @@ CANVAS_WIDTH = 800
 RUN_GAME = True
 screen = pygame.display.set_mode((CANVAS_WIDTH, CANVAS_HEIGHT))
 
-
-# loading in sprites should probably happen here??
-punch_img = pygame.image.load("D:\School\Game Dev with Andy\Final\\assets\punch.png")
-chop_img = pygame.image.load("D:\School\Game Dev with Andy\Final\\assets\chop.png")
-headbutt_img = pygame.image.load("D:\School\Game Dev with Andy\Final\\assets\headbutt.png")
-
 #linux
 #punch_img = pygame.image.load("/home/fuwafuwatime/PycharmProjects/Game-Dev-Final/assets/punch.png")
 #chop_img = pygame.image.load("/home/fuwafuwatime/PycharmProjects/Game-Dev-Final/assets/chop.png")

@@ -5,7 +5,7 @@ import pygame
 class Player:
     def __init__(self, health, equipment):
         self.health = health
-        self.eqipment = equipment
+        self.equipment = equipment
         self.action = "idle"
 
         # this will be set every time the player takes an action
@@ -18,8 +18,13 @@ class Player:
     # def equip():
 
     def takeAction(self, actionName):
-        self.action = actionName
-        if (self.action == "punch"):
-            self.damage = 50
-            self.speed = 4000
-            self.lastAttacked = pygame.time.get_ticks()
+        if self.action != actionName:
+            self.action = actionName
+            if self.action == "punch":
+                self.damage = 30
+                self.speed = 2500
+                self.lastAttacked = pygame.time.get_ticks()
+            if self.action == "chop":
+                self.damage = 10
+                self.speed = 1000
+                self.lastAttacked = pygame.time.get_ticks()
