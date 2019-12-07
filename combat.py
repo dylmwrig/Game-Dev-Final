@@ -67,6 +67,11 @@ def beginCombat(enemyFormation):
     cellThree = pygame.Rect(0, cfg.CANVAS_HEIGHT / 2, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
     cellFour = pygame.Rect(cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
     quadrants = [cellOne, cellTwo, cellThree, cellFour]
+    selector_img = assets.selector_img
+    selector_img = pygame.transform.scale(selector_img, (cellOne.width, cellOne.height))
+
+    playerArea = pygame.Rect(cfg.CANVAS_WIDTH * 3/8, cfg.CANVAS_HEIGHT * 3/8, cfg.CANVAS_WIDTH / 4, cfg.CANVAS_WIDTH / 4)
+    playerBorder = pygame.Rect((cfg.CANVAS_WIDTH * 3/8) - 2, (cfg.CANVAS_HEIGHT * 3/8) - 2, (cfg.CANVAS_WIDTH / 4) + 4, (cfg.CANVAS_WIDTH / 4) + 4)
 
     start_ticks = pygame.time.get_ticks()
     cursor_last_blit = start_ticks
@@ -82,7 +87,11 @@ def beginCombat(enemyFormation):
         curTime = pygame.time.get_ticks()
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
 
-        cfg.screen.fill((255,255,255));
+        cfg.screen.fill((255,255,255))
+
+        pygame.draw.line(cfg.screen, (0,0,0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
+        pygame.draw.line(cfg.screen, (0,0,0), (0, cfg.CANVAS_HEIGHT / 2), (cfg.CANVAS_WIDTH, cfg.CANVAS_HEIGHT / 2), 10)
+
 
         # display targeting reticle
         if (curTime - cursor_last_blit) > CURSOR_BLIT_SPEED:
@@ -92,6 +101,12 @@ def beginCombat(enemyFormation):
             else:
                 cursor_last_blit = pygame.time.get_ticks()
                 cursor_drawn = False
+
+        if cursor_drawn:
+            cfg.screen.blit(selector_img, quadrants[selectedCell])
+        cfg.screen.fill((0, 0, 0), playerBorder)
+        cfg.screen.fill((255,255,255), playerArea)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -131,9 +146,6 @@ def beginCombat(enemyFormation):
                 elif event.key == pygame.K_SPACE:
                     player.takeAction("defend")
 
-        if cursor_drawn:
-            cfg.screen.blit(assets.punch_img, quadrants[selectedCell])
-
         # player actions
         if (curTime - player.lastAttacked) > player.speed:
             if enemies[selectedCell] is not None:
@@ -159,10 +171,6 @@ def beginCombat(enemyFormation):
                         print("blocked!")
                     else:
                         player.health -= e.damage
-
                 cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
-
-        pygame.draw.line(cfg.screen, (0,0,0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
-        pygame.draw.line(cfg.screen, (0,0,0), (0, cfg.CANVAS_HEIGHT / 2), (cfg.CANVAS_WIDTH, cfg.CANVAS_HEIGHT / 2), 10)
 
         pygame.display.update()
