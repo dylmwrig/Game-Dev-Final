@@ -1,4 +1,5 @@
 import pygame
+import loadAssets as assets
 
 # player class
 # equipment is an array which will hold all of the player's powerups
@@ -12,10 +13,23 @@ class Player:
         self.damage = 0
         self.speed = 10000000
         self.lastAttacked = 0
+
+        self.idleSprites = [assets.player_idle1, assets.player_idle2]
+
+        self.sprite = assets.player_idle1
+        self.spriteArr = self.idleSprites
+        self.animIndex = 0
     # for each string in the equipment array, alter the player's stats
     # call this when combat starts
     # should be cleaner than directly buffing stats, allows for more flexibility
     # def equip():
+
+    def updateSprite(self):
+        if self.animIndex + 1 >= len(self.spriteArr):
+            self.animIndex = 0
+        else:
+            self.animIndex += 1
+        self.sprite = self.spriteArr[self.animIndex]
 
     def takeAction(self, actionName):
         if self.action != actionName:
@@ -24,7 +38,9 @@ class Player:
                 self.damage = 30
                 self.speed = 2500
                 self.lastAttacked = pygame.time.get_ticks()
+                #self.spriteArr = punchFrames
             if self.action == "chop":
                 self.damage = 10
                 self.speed = 1000
                 self.lastAttacked = pygame.time.get_ticks()
+                #self.spriteArr = chopFrames

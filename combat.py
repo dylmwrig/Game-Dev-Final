@@ -62,6 +62,8 @@ def beginCombat(enemyFormation):
     enemies = createEnemies(enemyFormation)
 
     CURSOR_BLIT_SPEED = 300
+    CHAR_ANIM_SPEED = 600
+
     cellOne = pygame.Rect(0, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
     cellTwo = pygame.Rect(cfg.CANVAS_WIDTH / 2, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
     cellThree = pygame.Rect(0, cfg.CANVAS_HEIGHT / 2, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
@@ -76,6 +78,7 @@ def beginCombat(enemyFormation):
     start_ticks = pygame.time.get_ticks()
     cursor_last_blit = start_ticks
     cursor_drawn = False
+    charLastAnim = start_ticks
 
     continueFight = True
     cfg.screen.fill((160,160,160))
@@ -92,7 +95,6 @@ def beginCombat(enemyFormation):
         pygame.draw.line(cfg.screen, (0,0,0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
         pygame.draw.line(cfg.screen, (0,0,0), (0, cfg.CANVAS_HEIGHT / 2), (cfg.CANVAS_WIDTH, cfg.CANVAS_HEIGHT / 2), 10)
 
-
         # display targeting reticle
         if (curTime - cursor_last_blit) > CURSOR_BLIT_SPEED:
             if not cursor_drawn:
@@ -105,7 +107,12 @@ def beginCombat(enemyFormation):
         if cursor_drawn:
             cfg.screen.blit(selector_img, quadrants[selectedCell])
         cfg.screen.fill((0, 0, 0), playerBorder)
-        cfg.screen.fill((255,255,255), playerArea)
+        cfg.screen.fill((255, 255, 255), playerArea)
+        cfg.screen.blit(player.sprite, playerArea)
+
+        if (curTime - charLastAnim) > CHAR_ANIM_SPEED:
+            charLastAnim = pygame.time.get_ticks()
+            player.updateSprite()
 
 
         for event in pygame.event.get():
@@ -173,4 +180,5 @@ def beginCombat(enemyFormation):
                         player.health -= e.damage
                 cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
 
+        pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()
