@@ -74,7 +74,9 @@ def beginCombat(enemyFormation):
 
     playerArea = pygame.Rect(cfg.CANVAS_WIDTH * 3/8, cfg.CANVAS_HEIGHT * 3/8, cfg.CANVAS_WIDTH / 4, cfg.CANVAS_WIDTH / 4)
     playerBorder = pygame.Rect((cfg.CANVAS_WIDTH * 3/8) - 2, (cfg.CANVAS_HEIGHT * 3/8) - 2, (cfg.CANVAS_WIDTH / 4) + 4, (cfg.CANVAS_WIDTH / 4) + 4)
-
+    playerInfoBarRect = pygame.Rect(playerArea.left, playerArea.bottom - 40, cfg.CANVAS_WIDTH / 4, 40)
+    playerHealthRect = pygame.Rect(playerArea.right - 101, playerArea.bottom - 35, 100, 10)
+    playerStamRect = pygame.Rect(playerArea.right - 101, playerArea.bottom - 15, 100, 10)
     start_ticks = pygame.time.get_ticks()
     cursor_last_blit = start_ticks
     cursor_drawn = False
@@ -113,7 +115,9 @@ def beginCombat(enemyFormation):
         if (curTime - charLastAnim) > CHAR_ANIM_SPEED:
             charLastAnim = pygame.time.get_ticks()
             player.updateSprite()
-
+        pygame.draw.rect(cfg.screen,(0,0,0),playerInfoBarRect)
+        pygame.draw.rect(cfg.screen,player.healthColor,playerHealthRect)
+        pygame.draw.rect(cfg.screen,(255,255,0),playerStamRect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

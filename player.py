@@ -6,6 +6,7 @@ import loadAssets as assets
 class Player:
     def __init__(self, health, equipment):
         self.health = health
+        self.healthColor = (0,255,0)
         self.equipment = equipment
         self.action = "idle"
 
@@ -44,3 +45,11 @@ class Player:
                 self.speed = 1000
                 self.lastAttacked = pygame.time.get_ticks()
                 #self.spriteArr = chopFrames
+
+    def takeAction(self):
+        if self.health < 33:
+            self.healthColor = (255,0,0)
+        elif self.health < 66:
+            self.healthColor = (255,255,0)
+        else:
+            self.healthColor = (0,255,0)
