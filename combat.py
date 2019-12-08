@@ -10,7 +10,7 @@ import enemy as enemy_class
 CURSOR_BLIT_SPEED = 300
 CHAR_ANIM_SPEED = 600
 
-player = player_class.Player(100, 0)
+player = player_class.Player(0)
 
 # four element list holding each enemy
 # first element corresponds to enemy in top left cell, second to top right, and so on
@@ -90,11 +90,13 @@ def drawScreen(selectedCell):
         cfg.screen.blit(player.actionIcon, (actionIconRect.left + 23, actionIconRect.top - 20))
     elif player.action == "headbutt":
         cfg.screen.blit(player.actionIcon, (actionIconRect.left - 5, actionIconRect.top - 22))
-    elif player.action == "defend":
+    elif player.action == "defend" or player.action == "defendNoStam":
         cfg.screen.blit(player.actionIcon, (actionIconRect.left + 10, actionIconRect.top + 5))
 
-    pygame.draw.rect(cfg.screen, player.healthColor, cfg.playerHealthRect)
-    pygame.draw.rect(cfg.screen, (255, 255, 0), cfg.playerStamRect)
+    if cfg.playerHealthRect.width > 0:
+        pygame.draw.rect(cfg.screen, player.healthColor, cfg.playerHealthRect)
+    if cfg.playerStamRect.width > 0:
+        pygame.draw.rect(cfg.screen, (255, 255, 0), cfg.playerStamRect)
 
     actionText = assets.actionFont.render('Action', False, (255, 255, 255))
     cfg.screen.blit(actionText, cfg.actionTextRect)
@@ -182,6 +184,14 @@ def beginCombat(enemyFormation):
                 print("Whiff!")
             player.lastAttacked = pygame.time.get_ticks()
 
+        # recharge player stamina
+        if (curTime - player.stamLastCharged) > player.stamChargeRate:
+            player.stamLastCharged = curTime
+            if player.action == "meditating":
+                print("Meditating")
+            else:
+                player.increaseStam(5)
+
         # each enemy starts with lastAttacked = -1.0
         # start their attack cycle once we are in the game loop
         # afterwards, check if curTime - lastAttacked >= speed; if it is, update lastAttacked with curTime and attack
@@ -191,10 +201,15 @@ def beginCombat(enemyFormation):
                     e.lastAttacked = curTime
                 elif curTime - e.lastAttacked >= e.speed:
                     e.lastAttacked = curTime
-                    if player.action == "blocking":
-                        print("blocked!")
+                    # if the player is blocking and out of stamina, they take full damage
+                    # otherwise they will take stamina damage
+                    if player.action == "defend":
+                        if player.stamina > 0:
+                            player.reduceStam(e.damage)
+                        else:
+                            player.takeDamage(e.damage)
                     else:
-                        player.health -= e.damage
+                        player.takeDamage(e.damage)
                 cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
 
         pygame.time.Clock().tick(cfg.FRAME_RATE)

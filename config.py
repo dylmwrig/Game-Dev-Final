@@ -7,7 +7,7 @@ CANVAS_WIDTH = 800
 RUN_GAME = True
 screen = pygame.display.set_mode((CANVAS_WIDTH, CANVAS_HEIGHT))
 
-FRAME_RATE = 30
+FRAME_RATE = 60
 
 playerArea = pygame.Rect((CANVAS_WIDTH / 4) + 70, CANVAS_HEIGHT * 3/8, CANVAS_WIDTH / 3, CANVAS_WIDTH / 4)
 playerBorder = pygame.Rect(playerArea.left - 2, playerArea.top - 2, playerArea.width + 4, playerArea.height + 4)

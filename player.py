@@ -1,11 +1,13 @@
 import pygame
 import loadAssets as assets
+import config as cfg
 
 # player class
 # equipment is an array which will hold all of the player's powerups
 class Player:
-    def __init__(self, health, equipment):
-        self.health = health
+    def __init__(self, equipment):
+        self.health = 100
+        self.stamina = 100
         self.healthColor = (0,255,0)
         self.equipment = equipment
 
@@ -19,16 +21,20 @@ class Player:
         self.lastAttacked = 0
         self.charLastAnim = pygame.time.get_ticks()
 
+        self.stamChargeRate = 1000
+        self.stamLastCharged = pygame.time.get_ticks()
+
         self.idleSprites = [assets.player_idle1, assets.player_idle2]
 
         # icon to display in bottom left of player area
         self.actionIcons = [assets.idle_icon, assets.punch_img, assets.chop_img, assets.headbutt_img,
-                            assets.defend_icon]
+                            assets.defend_icon, assets.defend_no_stam_icon]
         self.actionIcons[0] = pygame.transform.scale(self.actionIcons[0], (80,110))
         self.actionIcons[1] = pygame.transform.scale(self.actionIcons[1], (75,70))
         self.actionIcons[2] = pygame.transform.scale(self.actionIcons[2], (100,90))
         self.actionIcons[3] = pygame.transform.scale(self.actionIcons[3], (75,67))
         self.actionIcons[4] = pygame.transform.scale(self.actionIcons[4], (118,93))
+        self.actionIcons[5] = pygame.transform.scale(self.actionIcons[5], (118,93))
 
         self.actionIcon = self.actionIcons[0]
 
@@ -56,10 +62,13 @@ class Player:
                 self.actionIcon = self.actionIcons[0]
 
             elif self.action == "defend":
-                self.actionName = "defend"
-                self.actionIcon = self.actionIcons[4]
-
-
+                if self.stamina > 0:
+                    self.actionName = "defend"
+                    self.actionIcon = self.actionIcons[4]
+                else:
+                    self.action = "defendNoStam"
+                    self.actionName = "no stam"
+                    self.actionIcon = self.actionIcons[5]
             else:
                 self.lastAttacked = pygame.time.get_ticks()
                 if self.action == "punch":
@@ -80,6 +89,8 @@ class Player:
 
     def takeDamage(self, dmg):
         self.health -= dmg
+        print("Player health: " + str(self.health))
+        cfg.playerHealthRect.width = self.health
         if self.health < 0:
             #TODO GAME OVER
             print("You dead")
@@ -89,3 +100,27 @@ class Player:
             self.healthColor = (255,255,0)
         else:
             self.healthColor = (0,255,0)
+
+    # increase user's stamina
+    # this happens every game loop even if the user takes an action/gets hit/etc
+    # stamina will increase by a larger amount if meditating
+    def increaseStam(self, stam):
+        if self.stamina < 100:
+            self.stamina += stam
+            cfg.playerStamRect.width = self.stamina
+            if self.action == "defendNoStam":
+                self.action = "defend"
+                self.actionIcon = self.actionIcons[4]
+                self.actionName = "Defend"
+    # check if the user has run out of stam whenever stam is reduced
+    # for displaying icons and such
+    # do nothing if the user's stamina is already 0
+    def reduceStam(self, stam):
+        if self.stamina > 0:
+            self.stamina -= stam
+            cfg.playerStamRect.width = self.stamina
+            if self.stamina <= 0:
+                if self.action == "defend":
+                    self.action = "defendNoStam"
+                    self.actionIcon = self.actionIcons[5]
+                    self.actionName = "no stam"
