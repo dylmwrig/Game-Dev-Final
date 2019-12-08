@@ -10,6 +10,8 @@ import enemy as enemy_class
 CURSOR_BLIT_SPEED = 300
 CHAR_ANIM_SPEED = 600
 
+player = player_class.Player(100, 0)
+
 # four element list holding each enemy
 # first element corresponds to enemy in top left cell, second to top right, and so on
 # empty cells are represented by None and will just be skipped in the combat loop
@@ -51,6 +53,58 @@ def createEnemies(enemyFormation):
             enemies.append(enemy_class.Enemy(name, health, x, y, dmg, speed, -1.0, sprite))
     return enemies
 
+def drawScreen(selectedCell):
+    cfg.screen.fill((255, 255, 255))
+
+    pygame.draw.line(cfg.screen, (0, 0, 0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
+    pygame.draw.line(cfg.screen, (0, 0, 0), (0, cfg.CANVAS_HEIGHT / 2), (cfg.CANVAS_WIDTH, cfg.CANVAS_HEIGHT / 2), 10)
+
+    actionIconRect = pygame.Rect(cfg.playerHealthRect.left - player.actionIcon.get_rect().width + 4,
+                                 cfg.playerArea.bottom - player.actionIcon.get_rect().height + 30, 40, 40)
+
+    curTime = pygame.time.get_ticks()
+    # display targeting reticle
+    if (curTime - cfg.cursor_last_blit) > CURSOR_BLIT_SPEED:
+        if not cfg.cursor_drawn:
+            cfg.cursor_last_blit = pygame.time.get_ticks()
+            cfg.cursor_drawn = True
+        else:
+            cfg.cursor_last_blit = pygame.time.get_ticks()
+            cfg.cursor_drawn = False
+
+    if cfg.cursor_drawn:
+        cfg.screen.blit(assets.selector_img, cfg.quadrants[selectedCell])
+    cfg.screen.fill((0, 0, 0), cfg.playerBorder)
+    cfg.screen.fill((255, 255, 255), cfg.playerArea)
+    cfg.screen.blit(player.sprite, (cfg.playerArea.left + 40, cfg.playerArea.top - 15))
+
+    if (curTime - player.charLastAnim) > CHAR_ANIM_SPEED:
+        player.charLastAnim = pygame.time.get_ticks()
+        player.updateSprite()
+    pygame.draw.rect(cfg.screen, (0, 0, 0), cfg.playerInfoBarRect)
+    if player.action == "idle":
+        cfg.screen.blit(player.actionIcon, actionIconRect)
+    elif player.action == "punch":
+        cfg.screen.blit(player.actionIcon, (actionIconRect.left - 5, actionIconRect.top - 20))
+    elif player.action == "chop":
+        cfg.screen.blit(player.actionIcon, (actionIconRect.left + 23, actionIconRect.top - 20))
+    elif player.action == "headbutt":
+        cfg.screen.blit(player.actionIcon, (actionIconRect.left - 5, actionIconRect.top - 22))
+    elif player.action == "defend":
+        cfg.screen.blit(player.actionIcon, (actionIconRect.left + 10, actionIconRect.top + 5))
+
+    pygame.draw.rect(cfg.screen, player.healthColor, cfg.playerHealthRect)
+    pygame.draw.rect(cfg.screen, (255, 255, 0), cfg.playerStamRect)
+
+    actionText = assets.actionFont.render('Action', False, (255, 255, 255))
+    cfg.screen.blit(actionText, cfg.actionTextRect)
+    actionText = assets.actionFont.render(player.actionName, False, (255, 255, 255))
+    cfg.screen.blit(actionText, (cfg.actionTextRect.left, cfg.actionTextRect.bottom - 5))
+    hpText = assets.stamHealthFont.render('Health', False, (255, 255, 255))
+    cfg.screen.blit(hpText, (cfg.playerHealthRect.left, cfg.playerHealthRect.bottom - 4))
+    stamText = assets.stamHealthFont.render('Stamina', False, (255, 255, 255))
+    cfg.screen.blit(stamText, (cfg.playerStamRect.left, cfg.playerStamRect.bottom - 4))
+
 # basic fight loop
 # enemyFormation is a list of strings representing the enemy formation beginning the fight
 # "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
@@ -62,30 +116,9 @@ def beginCombat(enemyFormation):
     playerX = 370
     playerY = 480
 
-    player = player_class.Player(100, 0)
     enemies = createEnemies(enemyFormation)
 
-    cellOne = pygame.Rect(0, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
-    cellTwo = pygame.Rect(cfg.CANVAS_WIDTH / 2, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
-    cellThree = pygame.Rect(0, cfg.CANVAS_HEIGHT / 2, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
-    cellFour = pygame.Rect(cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
-    quadrants = [cellOne, cellTwo, cellThree, cellFour]
-    selector_img = assets.selector_img
-    selector_img = pygame.transform.scale(selector_img, (cellOne.width, cellOne.height))
-
-    playerArea = pygame.Rect((cfg.CANVAS_WIDTH / 4) + 70, cfg.CANVAS_HEIGHT * 3/8, cfg.CANVAS_WIDTH / 3, cfg.CANVAS_WIDTH / 4)
-    playerBorder = pygame.Rect(playerArea.left - 2, playerArea.top - 2, playerArea.width + 4, playerArea.height + 4)
-    playerInfoBarRect = pygame.Rect(playerArea.left, playerArea.bottom - 60, playerArea.width, 60)
-    actionTextRect = pygame.Rect(playerArea.left, playerInfoBarRect.top + 1, 40, 40)
-    playerHealthRect = pygame.Rect(playerArea.right - 101, playerInfoBarRect.top + 1, 100, 15)
-    playerStamRect = pygame.Rect(playerArea.right - 101, playerBorder.bottom - 32, 100, 15)
-    actionIconRect = pygame.Rect(playerHealthRect.left - player.actionIcon.get_rect().width + 4,
-                                 playerArea.bottom - player.actionIcon.get_rect().height + 30, 40, 40)
-
     start_ticks = pygame.time.get_ticks()
-    cursor_last_blit = start_ticks
-    cursor_drawn = False
-    charLastAnim = start_ticks
 
     continueFight = True
     cfg.screen.fill((160,160,160))
@@ -96,53 +129,6 @@ def beginCombat(enemyFormation):
     while continueFight:
         curTime = pygame.time.get_ticks()
         seconds = (pygame.time.get_ticks() - start_ticks) / 1000
-
-        cfg.screen.fill((255,255,255))
-
-        pygame.draw.line(cfg.screen, (0,0,0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
-        pygame.draw.line(cfg.screen, (0,0,0), (0, cfg.CANVAS_HEIGHT / 2), (cfg.CANVAS_WIDTH, cfg.CANVAS_HEIGHT / 2), 10)
-
-        # display targeting reticle
-        if (curTime - cursor_last_blit) > CURSOR_BLIT_SPEED:
-            if not cursor_drawn:
-                cursor_last_blit = pygame.time.get_ticks()
-                cursor_drawn = True
-            else:
-                cursor_last_blit = pygame.time.get_ticks()
-                cursor_drawn = False
-
-        if cursor_drawn:
-            cfg.screen.blit(selector_img, quadrants[selectedCell])
-        cfg.screen.fill((0, 0, 0), playerBorder)
-        cfg.screen.fill((255, 255, 255), playerArea)
-        cfg.screen.blit(player.sprite, (playerArea.left + 40, playerArea.top - 15))
-
-        if (curTime - charLastAnim) > CHAR_ANIM_SPEED:
-            charLastAnim = pygame.time.get_ticks()
-            player.updateSprite()
-        pygame.draw.rect(cfg.screen,(0,0,0),playerInfoBarRect)
-        if player.action == "idle":
-            cfg.screen.blit(player.actionIcon, actionIconRect)
-        elif player.action == "punch":
-            cfg.screen.blit(player.actionIcon, (actionIconRect.left, actionIconRect.top + 20))
-        elif player.action == "chop":
-            cfg.screen.blit(player.actionIcon, (actionIconRect.left, actionIconRect.top))
-        elif player.action == "headbutt":
-            cfg.screen.blit(player.actionIcon, (actionIconRect.left, actionIconRect.top + 20))
-        elif player.action == "defend":
-            cfg.screen.blit(player.actionIcon, (actionIconRect.left - 28, actionIconRect.top + 22))
-
-        pygame.draw.rect(cfg.screen,player.healthColor,playerHealthRect)
-        pygame.draw.rect(cfg.screen,(255,255,0),playerStamRect)
-
-        actionText = assets.actionFont.render('Action', False, (255,255,255))
-        cfg.screen.blit(actionText,actionTextRect)
-        actionText = assets.actionFont.render(player.actionName, False, (255,255,255))
-        cfg.screen.blit(actionText,(actionTextRect.left, actionTextRect.bottom - 5))
-        hpText = assets.stamHealthFont.render('Health', False, (255,255,255))
-        cfg.screen.blit(hpText,(playerHealthRect.left, playerHealthRect.bottom - 4))
-        stamText = assets.stamHealthFont.render('Stamina', False, (255,255,255))
-        cfg.screen.blit(stamText,(playerStamRect.left, playerStamRect.bottom - 4))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -213,3 +199,4 @@ def beginCombat(enemyFormation):
 
         pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()
+        drawScreen(selectedCell)

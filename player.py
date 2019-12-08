@@ -17,6 +17,7 @@ class Player:
         self.damage = 0
         self.speed = 10000000
         self.lastAttacked = 0
+        self.charLastAnim = pygame.time.get_ticks()
 
         self.idleSprites = [assets.player_idle1, assets.player_idle2]
 
