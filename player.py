@@ -21,11 +21,13 @@ class Player:
         self.idleSprites = [assets.player_idle1, assets.player_idle2]
 
         # icon to display in bottom left of player area
-        self.actionIcons = [assets.idle_icon, assets.punch_img, assets.chop_img, assets.headbutt_img]
+        self.actionIcons = [assets.idle_icon, assets.punch_img, assets.chop_img, assets.headbutt_img,
+                            assets.defend_icon]
         self.actionIcons[0] = pygame.transform.scale(self.actionIcons[0], (80,110))
         self.actionIcons[1] = pygame.transform.scale(self.actionIcons[1], (75,70))
         self.actionIcons[2] = pygame.transform.scale(self.actionIcons[2], (100,90))
-        self.actionIcons[3] = pygame.transform.scale(self.actionIcons[3], (75,70))
+        self.actionIcons[3] = pygame.transform.scale(self.actionIcons[3], (75,67))
+        self.actionIcons[4] = pygame.transform.scale(self.actionIcons[4], (118,93))
 
         self.actionIcon = self.actionIcons[0]
 
@@ -51,6 +53,11 @@ class Player:
             if self.action == "idle":
                 self.actionName = "idle"
                 self.actionIcon = self.actionIcons[0]
+
+            elif self.action == "defend":
+                self.actionName = "defend"
+                self.actionIcon = self.actionIcons[4]
+
 
             else:
                 self.lastAttacked = pygame.time.get_ticks()

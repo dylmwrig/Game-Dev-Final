@@ -129,6 +129,8 @@ def beginCombat(enemyFormation):
             cfg.screen.blit(player.actionIcon, (actionIconRect.left, actionIconRect.top))
         elif player.action == "headbutt":
             cfg.screen.blit(player.actionIcon, (actionIconRect.left, actionIconRect.top + 20))
+        elif player.action == "defend":
+            cfg.screen.blit(player.actionIcon, (actionIconRect.left - 28, actionIconRect.top + 22))
 
         pygame.draw.rect(cfg.screen,player.healthColor,playerHealthRect)
         pygame.draw.rect(cfg.screen,(255,255,0),playerStamRect)
@@ -171,7 +173,9 @@ def beginCombat(enemyFormation):
                     else:
                         selectedCell += 2
 
-                if event.key == pygame.K_a:
+                if event.key == pygame.K_SPACE:
+                    player.takeAction("defend")
+                elif event.key == pygame.K_a:
                     player.takeAction("punch")
                 elif event.key == pygame.K_s:
                     player.takeAction("chop")
