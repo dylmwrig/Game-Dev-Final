@@ -79,7 +79,7 @@ def beginCombat(enemyFormation):
     actionTextRect = pygame.Rect(playerArea.left, playerInfoBarRect.top + 1, 40, 40)
     playerHealthRect = pygame.Rect(playerArea.right - 101, playerInfoBarRect.top + 1, 100, 15)
     playerStamRect = pygame.Rect(playerArea.right - 101, playerBorder.bottom - 32, 100, 15)
-    actionIconRect = pygame.Rect(playerHealthRect.left - player.actionIcon.get_rect().width + 8,
+    actionIconRect = pygame.Rect(playerHealthRect.left - player.actionIcon.get_rect().width + 4,
                                  playerArea.bottom - player.actionIcon.get_rect().height + 30, 40, 40)
 
     start_ticks = pygame.time.get_ticks()
@@ -122,11 +122,13 @@ def beginCombat(enemyFormation):
             player.updateSprite()
         pygame.draw.rect(cfg.screen,(0,0,0),playerInfoBarRect)
         if player.action == "idle":
-                cfg.screen.blit(player.actionIcon, actionIconRect)
+            cfg.screen.blit(player.actionIcon, actionIconRect)
         elif player.action == "punch":
-                tmp = actionIconRect
-                tmp.top += 30
-                cfg.screen.blit(player.actionIcon, tmp)
+            cfg.screen.blit(player.actionIcon, (actionIconRect.left, actionIconRect.top + 20))
+        elif player.action == "chop":
+            cfg.screen.blit(player.actionIcon, (actionIconRect.left, actionIconRect.top))
+        elif player.action == "headbutt":
+            cfg.screen.blit(player.actionIcon, (actionIconRect.left, actionIconRect.top + 20))
 
         pygame.draw.rect(cfg.screen,player.healthColor,playerHealthRect)
         pygame.draw.rect(cfg.screen,(255,255,0),playerStamRect)

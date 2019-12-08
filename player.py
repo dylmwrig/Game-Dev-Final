@@ -23,7 +23,9 @@ class Player:
         # icon to display in bottom left of player area
         self.actionIcons = [assets.idle_icon, assets.punch_img, assets.chop_img, assets.headbutt_img]
         self.actionIcons[0] = pygame.transform.scale(self.actionIcons[0], (80,110))
-        self.actionIcons[1] = pygame.transform.scale(self.actionIcons[1], (80,70))
+        self.actionIcons[1] = pygame.transform.scale(self.actionIcons[1], (75,70))
+        self.actionIcons[2] = pygame.transform.scale(self.actionIcons[2], (100,90))
+        self.actionIcons[3] = pygame.transform.scale(self.actionIcons[3], (75,70))
 
         self.actionIcon = self.actionIcons[0]
 
@@ -49,21 +51,24 @@ class Player:
             if self.action == "idle":
                 self.actionName = "idle"
                 self.actionIcon = self.actionIcons[0]
-            if self.action == "punch":
-                self.actionName = "punch"
-                self.damage = 30
-                self.speed = 2500
+
+            else:
                 self.lastAttacked = pygame.time.get_ticks()
-                #self.spriteArr = punchFrames
-                self.actionIcon = self.actionIcons[1]
-            if self.action == "chop":
-                self.actionName = "chop"
-                self.damage = 10
-                self.speed = 1000
-                self.lastAttacked = pygame.time.get_ticks()
-                #self.spriteArr = chopFrames
-            if self.action == "headbutt":
-                self.actionName = "hedbut"
+                if self.action == "punch":
+                    self.actionName = "punch"
+                    self.damage = 30
+                    self.speed = 2500
+                    #self.spriteArr = punchFrames
+                    self.actionIcon = self.actionIcons[1]
+                if self.action == "chop":
+                    self.actionName = "chop"
+                    self.damage = 10
+                    self.speed = 1000
+                    #self.spriteArr = chopFrames
+                    self.actionIcon = self.actionIcons[2]
+                if self.action == "headbutt":
+                    self.actionName = "hedbut"
+                    self.actionIcon = self.actionIcons[3]
 
     def takeDamage(self, dmg):
         self.health -= dmg
