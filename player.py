@@ -8,7 +8,10 @@ class Player:
         self.health = health
         self.healthColor = (0,255,0)
         self.equipment = equipment
+
+        # action name is displayed; needs to be its own var as headbutt is too long to display
         self.action = "idle"
+        self.actionName = "idle"
 
         # this will be set every time the player takes an action
         self.damage = 0
@@ -16,6 +19,13 @@ class Player:
         self.lastAttacked = 0
 
         self.idleSprites = [assets.player_idle1, assets.player_idle2]
+
+        # icon to display in bottom left of player area
+        self.actionIcons = [assets.idle_icon, assets.punch_img, assets.chop_img, assets.headbutt_img]
+        self.actionIcons[0] = pygame.transform.scale(self.actionIcons[0], (80,110))
+        self.actionIcons[1] = pygame.transform.scale(self.actionIcons[1], (80,70))
+
+        self.actionIcon = self.actionIcons[0]
 
         self.sprite = assets.player_idle1
         self.spriteArr = self.idleSprites
@@ -35,19 +45,32 @@ class Player:
     def takeAction(self, actionName):
         if self.action != actionName:
             self.action = actionName
+            # idle state entered after an action has completed
+            if self.action == "idle":
+                self.actionName = "idle"
+                self.actionIcon = self.actionIcons[0]
             if self.action == "punch":
+                self.actionName = "punch"
                 self.damage = 30
                 self.speed = 2500
                 self.lastAttacked = pygame.time.get_ticks()
                 #self.spriteArr = punchFrames
+                self.actionIcon = self.actionIcons[1]
             if self.action == "chop":
+                self.actionName = "chop"
                 self.damage = 10
                 self.speed = 1000
                 self.lastAttacked = pygame.time.get_ticks()
                 #self.spriteArr = chopFrames
+            if self.action == "headbutt":
+                self.actionName = "hedbut"
 
-    def takeAction(self):
-        if self.health < 33:
+    def takeDamage(self, dmg):
+        self.health -= dmg
+        if self.health < 0:
+            #TODO GAME OVER
+            print("You dead")
+        elif self.health < 33:
             self.healthColor = (255,0,0)
         elif self.health < 66:
             self.healthColor = (255,255,0)

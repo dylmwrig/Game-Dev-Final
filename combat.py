@@ -7,6 +7,8 @@ import enemy as enemy_class
 
 #def playerTakeAction(action):
 
+CURSOR_BLIT_SPEED = 300
+CHAR_ANIM_SPEED = 600
 
 # four element list holding each enemy
 # first element corresponds to enemy in top left cell, second to top right, and so on
@@ -53,6 +55,8 @@ def createEnemies(enemyFormation):
 # enemyFormation is a list of strings representing the enemy formation beginning the fight
 # "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
 def beginCombat(enemyFormation):
+    pygame.init()
+
     #ss = spritesheet.spritesheet('playerTemp.png')
     #player_image = ss.image_at((50, 10, 35, 35))
     playerX = 370
@@ -60,9 +64,6 @@ def beginCombat(enemyFormation):
 
     player = player_class.Player(100, 0)
     enemies = createEnemies(enemyFormation)
-
-    CURSOR_BLIT_SPEED = 300
-    CHAR_ANIM_SPEED = 600
 
     cellOne = pygame.Rect(0, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
     cellTwo = pygame.Rect(cfg.CANVAS_WIDTH / 2, 0, cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT / 2)
@@ -72,11 +73,15 @@ def beginCombat(enemyFormation):
     selector_img = assets.selector_img
     selector_img = pygame.transform.scale(selector_img, (cellOne.width, cellOne.height))
 
-    playerArea = pygame.Rect(cfg.CANVAS_WIDTH * 3/8, cfg.CANVAS_HEIGHT * 3/8, cfg.CANVAS_WIDTH / 4, cfg.CANVAS_WIDTH / 4)
-    playerBorder = pygame.Rect((cfg.CANVAS_WIDTH * 3/8) - 2, (cfg.CANVAS_HEIGHT * 3/8) - 2, (cfg.CANVAS_WIDTH / 4) + 4, (cfg.CANVAS_WIDTH / 4) + 4)
-    playerInfoBarRect = pygame.Rect(playerArea.left, playerArea.bottom - 40, cfg.CANVAS_WIDTH / 4, 40)
-    playerHealthRect = pygame.Rect(playerArea.right - 101, playerArea.bottom - 35, 100, 10)
-    playerStamRect = pygame.Rect(playerArea.right - 101, playerArea.bottom - 15, 100, 10)
+    playerArea = pygame.Rect((cfg.CANVAS_WIDTH / 4) + 70, cfg.CANVAS_HEIGHT * 3/8, cfg.CANVAS_WIDTH / 3, cfg.CANVAS_WIDTH / 4)
+    playerBorder = pygame.Rect(playerArea.left - 2, playerArea.top - 2, playerArea.width + 4, playerArea.height + 4)
+    playerInfoBarRect = pygame.Rect(playerArea.left, playerArea.bottom - 60, playerArea.width, 60)
+    actionTextRect = pygame.Rect(playerArea.left, playerInfoBarRect.top + 1, 40, 40)
+    playerHealthRect = pygame.Rect(playerArea.right - 101, playerInfoBarRect.top + 1, 100, 15)
+    playerStamRect = pygame.Rect(playerArea.right - 101, playerBorder.bottom - 32, 100, 15)
+    actionIconRect = pygame.Rect(playerHealthRect.left - player.actionIcon.get_rect().width + 8,
+                                 playerArea.bottom - player.actionIcon.get_rect().height + 30, 40, 40)
+
     start_ticks = pygame.time.get_ticks()
     cursor_last_blit = start_ticks
     cursor_drawn = False
@@ -110,14 +115,30 @@ def beginCombat(enemyFormation):
             cfg.screen.blit(selector_img, quadrants[selectedCell])
         cfg.screen.fill((0, 0, 0), playerBorder)
         cfg.screen.fill((255, 255, 255), playerArea)
-        cfg.screen.blit(player.sprite, playerArea)
+        cfg.screen.blit(player.sprite, (playerArea.left + 40, playerArea.top - 15))
 
         if (curTime - charLastAnim) > CHAR_ANIM_SPEED:
             charLastAnim = pygame.time.get_ticks()
             player.updateSprite()
         pygame.draw.rect(cfg.screen,(0,0,0),playerInfoBarRect)
+        if player.action == "idle":
+                cfg.screen.blit(player.actionIcon, actionIconRect)
+        elif player.action == "punch":
+                tmp = actionIconRect
+                tmp.top += 30
+                cfg.screen.blit(player.actionIcon, tmp)
+
         pygame.draw.rect(cfg.screen,player.healthColor,playerHealthRect)
         pygame.draw.rect(cfg.screen,(255,255,0),playerStamRect)
+
+        actionText = assets.actionFont.render('Action', False, (255,255,255))
+        cfg.screen.blit(actionText,actionTextRect)
+        actionText = assets.actionFont.render(player.actionName, False, (255,255,255))
+        cfg.screen.blit(actionText,(actionTextRect.left, actionTextRect.bottom - 5))
+        hpText = assets.stamHealthFont.render('Health', False, (255,255,255))
+        cfg.screen.blit(hpText,(playerHealthRect.left, playerHealthRect.bottom - 4))
+        stamText = assets.stamHealthFont.render('Stamina', False, (255,255,255))
+        cfg.screen.blit(stamText,(playerStamRect.left, playerStamRect.bottom - 4))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -151,7 +172,7 @@ def beginCombat(enemyFormation):
                 if event.key == pygame.K_a:
                     player.takeAction("punch")
                 elif event.key == pygame.K_s:
-                    player.takeAction("kick")
+                    player.takeAction("chop")
                 elif event.key == pygame.K_d:
                     player.takeAction("headbutt")
                 elif event.key == pygame.K_SPACE:
