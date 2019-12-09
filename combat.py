@@ -61,9 +61,11 @@ def createEnemies(enemyFormation):
 
             # adjust the enemy's location based on it's image
             # so it's location will be centered to the center of the actual sprite
-            x -= sprite.get_rect().width / 2
-            y -= sprite.get_rect().height / 2
+            #x -= sprite.get_rect().width / 2
+            x -= 65
+            y -= 90
 
+            print(str(x) + " " + str(y))
             enemies.append(enemy_class.Enemy(name, health, x, y, dmg, speed, sprite, idleSprites, attackSprite))
     return enemies
 
