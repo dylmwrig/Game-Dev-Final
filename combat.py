@@ -157,6 +157,14 @@ def drawScreen(selectedCell, enemies):
                 e.lastAnim = curTime
             cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
 
+            healthRect = pygame.Rect(e.xPos + 10, e.yPos + e.sprite.get_rect().height + 5, e.health, 10)
+            healthColor = (0,255,0)
+            if e.health < 33:
+                healthColor = (255,0,0)
+            elif e.health < 66:
+                healthColor = (255, 255, 0)
+            pygame.draw.rect(cfg.screen, healthColor, healthRect)
+
 # basic fight loop
 # enemyFormation is a list of strings representing the enemy formation beginning the fight
 # "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
@@ -221,11 +229,12 @@ def beginCombat(enemyFormation):
         # player actions
         if (curTime - player.lastAttacked) > player.speed:
             if enemies[selectedCell] is not None:
-                enemies[selectedCell].health -= player.damage
-                print(enemies[selectedCell].name)
-                print(enemies[selectedCell].health)
-                if enemies[selectedCell].health <= 0:
-                    enemies[selectedCell] = None
+                if player.damage > 0:
+                    enemies[selectedCell].health -= player.damage
+                    print(enemies[selectedCell].name)
+                    print(enemies[selectedCell].health)
+                    if enemies[selectedCell].health <= 0:
+                       enemies[selectedCell] = None
             else:
                 print("Whiff!")
             player.lastAttacked = pygame.time.get_ticks()

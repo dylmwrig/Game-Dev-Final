@@ -73,11 +73,13 @@ class Player:
         else:
             self.action = actionName
             if self.action == "idle":
+                self.damage = 0
                 self.actionName = "idle"
                 self.actionIcon = self.actionIcons[0]
 
             elif self.action == "defend":
                 self.parryStart = pygame.time.get_ticks()
+                self.damage = 0
                 if self.stamina > 0:
                     self.actionName = "defend"
                     self.actionIcon = self.actionIcons[4]
