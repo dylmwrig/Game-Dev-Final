@@ -1,5 +1,4 @@
 import pygame
-import spritesheet
 import loadAssets as assets
 import config as cfg
 import player as player_class
@@ -39,21 +38,36 @@ def createEnemies(enemyFormation):
 
             if name == "Samurai":
                 speed = 2000
+                dmg = 10
+                health = 100
+                sprite = assets.samurai_sprite_idle1
+                sprite = pygame.transform.scale(sprite, (75, 100))
+                idleSprites = [assets.samurai_sprite_idle1, assets.samurai_sprite_idle2]
+                attackSprite = assets.samurai_sprite_attack
+            elif name == "Ninja":
+                speed = 1500
+                dmg = 5
+                health = 100
+                sprite = assets.ninja_sprite_idle1
+                idleSprites = [assets.ninja_sprite_idle1, assets.ninja_sprite_idle2]
+                attackSprite = assets.ninja_sprite_attack
+            elif name == "Oni":
+                speed = 2500
                 dmg = 15
                 health = 100
-                #ss = spritesheet.spritesheet('enemyTemp.png')
-                #sprite = ss.image_at((0,0,15,30))
-                sprite = assets.headbutt_img
-                sprite = pygame.transform.scale(sprite, (75, 100))
+                sprite = assets.oni_sprite_idle1
+                idleSprites = [assets.oni_sprite_idle1, assets.oni_sprite_idle2]
+                attackSprite = assets.oni_sprite_attack
+
             # adjust the enemy's location based on it's image
             # so it's location will be centered to the center of the actual sprite
             x -= sprite.get_rect().width / 2
             y -= sprite.get_rect().height / 2
 
-            enemies.append(enemy_class.Enemy(name, health, x, y, dmg, speed, -1.0, sprite))
+            enemies.append(enemy_class.Enemy(name, health, x, y, dmg, speed, sprite, idleSprites, attackSprite))
     return enemies
 
-def drawScreen(selectedCell):
+def drawScreen(selectedCell, enemies):
     cfg.screen.fill((255, 255, 255))
 
     pygame.draw.line(cfg.screen, (0, 0, 0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
@@ -124,6 +138,23 @@ def drawScreen(selectedCell):
     stamText = assets.stamHealthFont.render('Stamina', False, (255, 255, 255))
     cfg.screen.blit(stamText, (cfg.playerStamRect.left, cfg.playerStamRect.bottom - 4))
 
+    for e in enemies:
+        if e is not None:
+            if e.attackAnimTime != -1:
+                # attack sprite will linger on screen for 500ms for now
+                # longer if I introduce some character based recovery time system
+                if (curTime - e.attackAnimTime) <= 500:
+                    e.sprite = e.attackSprite
+                # attack animation has completed
+                else:
+                    e.attackAnimTime = -1
+
+            elif (curTime - e.lastAnim) > CHAR_ANIM_SPEED:
+                e.idleIndex = (e.idleIndex + 1) % 2
+                e.sprite = e.idleSprites[e.idleIndex]
+                e.lastAnim = curTime
+            cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
+
 # basic fight loop
 # enemyFormation is a list of strings representing the enemy formation beginning the fight
 # "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
@@ -134,14 +165,13 @@ def beginCombat(enemyFormation):
     start_ticks = pygame.time.get_ticks()
 
     continueFight = True
-    cfg.screen.fill((160,160,160))
 
     # selectedCell represents where the player is currently targeting
     # 0 represents top left, 1 is top right, 2 is bottom left, 3 is bottom right
     selectedCell = 0
     while continueFight:
         curTime = pygame.time.get_ticks()
-        seconds = (pygame.time.get_ticks() - start_ticks) / 1000
+        #seconds = (pygame.time.get_ticks() - start_ticks) / 1000
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -216,6 +246,7 @@ def beginCombat(enemyFormation):
                     e.lastAttacked = curTime
                 elif curTime - e.lastAttacked >= e.speed:
                     e.lastAttacked = curTime
+                    e.attackAnimTime = curTime
                     # if the player is blocking and out of stamina, they take full damage
                     # otherwise they will take stamina damage
                     if player.action == "defend":
@@ -232,8 +263,7 @@ def beginCombat(enemyFormation):
                             player.takeDamage(e.damage)
                     else:
                         player.takeDamage(e.damage)
-                cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
 
         pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()
-        drawScreen(selectedCell)
+        drawScreen(selectedCell, enemies)

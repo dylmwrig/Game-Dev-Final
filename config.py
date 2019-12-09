@@ -31,4 +31,4 @@ cursor_drawn = False
 #headbutt_img = pygame.image.load("/home/fuwafuwatime/PycharmProjects/Game-Dev-Final/assets/headbutt.png")
 
 # easy enemy formations, use these in the beginning
-simpleEnemyFormations = [["", "", "", "Samurai"]]
+simpleEnemyFormations = [["Samurai", "", "Ninja", "Oni"]]
