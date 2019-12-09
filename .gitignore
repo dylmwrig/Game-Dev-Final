@@ -1,5 +1,3 @@
 tempAssets/*
 *Temp.png
 venv/
-# load in files from different loadAssets files to avoid directory problems on diff machines
-loadAssets.py
