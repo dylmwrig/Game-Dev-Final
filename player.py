@@ -18,13 +18,25 @@ class Player:
         # this will be set every time the player takes an action
         self.damage = 0
         self.speed = 10000000
+        self.stamCost = 0
         self.lastAttacked = 0
         self.charLastAnim = pygame.time.get_ticks()
 
-        self.stamChargeRate = 1000
+        self.parryStart = 0
+        self.riposteStart = 0
+        self.parryWindow = 500
+        self.riposteWindow = 1000
+
+        self.stamChargeRate = 2000
         self.stamLastCharged = pygame.time.get_ticks()
 
         self.idleSprites = [assets.player_idle1, assets.player_idle2]
+
+        # change the color behind the player depending on what's happening
+        self.bgAlpha = 255
+        self.bgColor = (0,0,0)
+        self.bgAnimating = False
+        self.bgAnimSpeed = 10 # num to subtract from alpha at each step; increase for faster anim
 
         # icon to display in bottom left of player area
         self.actionIcons = [assets.idle_icon, assets.punch_img, assets.chop_img, assets.headbutt_img,
@@ -54,17 +66,25 @@ class Player:
         self.sprite = self.spriteArr[self.animIndex]
 
     def takeAction(self, actionName):
-        if self.action != actionName:
+        if self.action == actionName:
+            # if the player is already defending, go idle, allows for timed parries
+            if actionName == "defend":
+                self.takeAction("idle")
+        else:
             self.action = actionName
-            # idle state entered after an action has completed
             if self.action == "idle":
                 self.actionName = "idle"
                 self.actionIcon = self.actionIcons[0]
 
             elif self.action == "defend":
+                self.parryStart = pygame.time.get_ticks()
                 if self.stamina > 0:
                     self.actionName = "defend"
                     self.actionIcon = self.actionIcons[4]
+                    self.bgAlpha = 255
+                    self.bgColor = (76,0,153)
+                    self.bgAnimating = True
+                    self.bgAnimSpeed = 10
                 else:
                     self.action = "defendNoStam"
                     self.actionName = "no stam"
@@ -75,6 +95,7 @@ class Player:
                     self.actionName = "punch"
                     self.damage = 30
                     self.speed = 2500
+                    self.stamCost = 10
                     #self.spriteArr = punchFrames
                     self.actionIcon = self.actionIcons[1]
                 if self.action == "chop":
@@ -86,6 +107,9 @@ class Player:
                 if self.action == "headbutt":
                     self.actionName = "hedbut"
                     self.actionIcon = self.actionIcons[3]
+
+                if (pygame.time.get_ticks() - self.riposteStart) < self.riposteWindow:
+                    self.speed = round(self.speed / 2)
 
     def takeDamage(self, dmg):
         self.health -= dmg

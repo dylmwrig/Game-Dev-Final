@@ -38,7 +38,7 @@ def createEnemies(enemyFormation):
                 y = cfg.CANVAS_HEIGHT * (3/4)
 
             if name == "Samurai":
-                speed = 1500
+                speed = 2000
                 dmg = 15
                 health = 100
                 #ss = spritesheet.spritesheet('enemyTemp.png')
@@ -72,15 +72,32 @@ def drawScreen(selectedCell):
             cfg.cursor_last_blit = pygame.time.get_ticks()
             cfg.cursor_drawn = False
 
+    if not player.bgAnimating:
+        cfg.screen.fill((0, 0, 0), cfg.playerBorder)
+        cfg.screen.fill((255, 255, 255), cfg.playerArea)
+
+    else:
+        playerBackground = pygame.Surface((cfg.playerArea.width, cfg.playerArea.height))
+        playerBackground.fill(player.bgColor)
+        cfg.screen.fill((0, 0, 0), cfg.playerBorder)
+        cfg.screen.fill((255, 255, 255), cfg.playerArea)
+        if player.bgAlpha > 0:
+            playerBackground.set_alpha(player.bgAlpha)
+            cfg.screen.blit(playerBackground, (cfg.playerArea.left, cfg.playerArea.top))
+            player.bgAlpha -= player.bgAnimSpeed
+        else:
+            player.bgAlpha = 255
+            player.bgColor = (255,255,255)
+            player.bgAnimating = False
+
     if cfg.cursor_drawn:
         cfg.screen.blit(assets.selector_img, cfg.quadrants[selectedCell])
-    cfg.screen.fill((0, 0, 0), cfg.playerBorder)
-    cfg.screen.fill((255, 255, 255), cfg.playerArea)
     cfg.screen.blit(player.sprite, (cfg.playerArea.left + 40, cfg.playerArea.top - 15))
 
     if (curTime - player.charLastAnim) > CHAR_ANIM_SPEED:
         player.charLastAnim = pygame.time.get_ticks()
         player.updateSprite()
+
     pygame.draw.rect(cfg.screen, (0, 0, 0), cfg.playerInfoBarRect)
     if player.action == "idle":
         cfg.screen.blit(player.actionIcon, actionIconRect)
@@ -113,13 +130,7 @@ def drawScreen(selectedCell):
 def beginCombat(enemyFormation):
     pygame.init()
 
-    #ss = spritesheet.spritesheet('playerTemp.png')
-    #player_image = ss.image_at((50, 10, 35, 35))
-    playerX = 370
-    playerY = 480
-
     enemies = createEnemies(enemyFormation)
-
     start_ticks = pygame.time.get_ticks()
 
     continueFight = True
@@ -169,6 +180,9 @@ def beginCombat(enemyFormation):
                     player.takeAction("chop")
                 elif event.key == pygame.K_d:
                     player.takeAction("headbutt")
+                #elif event.key == pygame.K_q:
+                #    player.takeAction("meditate")
+                # allows the player to go in and out of defense for parries
                 elif event.key == pygame.K_SPACE:
                     player.takeAction("defend")
 
@@ -183,6 +197,7 @@ def beginCombat(enemyFormation):
             else:
                 print("Whiff!")
             player.lastAttacked = pygame.time.get_ticks()
+            player.reduceStam(player.stamCost)
 
         # recharge player stamina
         if (curTime - player.stamLastCharged) > player.stamChargeRate:
@@ -206,6 +221,13 @@ def beginCombat(enemyFormation):
                     if player.action == "defend":
                         if player.stamina > 0:
                             player.reduceStam(e.damage)
+                            # player hit their parry, give them a second long riposte window
+                            if (curTime - player.parryStart) <= player.parryWindow:
+                                player.riposteStart = pygame.time.get_ticks()
+                                player.bgAlpha = 255
+                                player.bgColor = (255,0,0)
+                                player.bgAnimating = True
+                                player.bgAnimSpeed = 5
                         else:
                             player.takeDamage(e.damage)
                     else:
