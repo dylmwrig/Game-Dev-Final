@@ -1,5 +1,8 @@
 Kung Fu Escape
 
+Running: install pygame via pip then simply run
+python3 main.py
+
 Main Menu controls:
 arrow keys to select entry, enter to start combat with selected difficulty
 
