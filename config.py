@@ -28,4 +28,8 @@ cursor_drawn = False
 # easy enemy formations, use these in the beginning
 simpleEnemyFormations = [["Samurai", "Oni", "", "Ninja"]]
 
-waveOneRespawnWaves = ["Samurai", "Oni", "Ninja"]
+# each list represents all reinforcements for a given wave
+# ie respawnWaves [1] contains all reinforcements for wave 2
+# elements selected from list randomly so ordering doesn't matter
+respawnWaves = [["Samurai", "Oni", "Ninja"],
+                []]

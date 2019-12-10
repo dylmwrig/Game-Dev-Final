@@ -183,6 +183,16 @@ def drawScreen(selectedCell, enemies):
 def beginCombat(difficulty):
     pygame.init()
 
+    curWave = 0
+
+    if difficulty == "EASY":
+        reinforceSpeed = 10000
+    elif difficulty == "MEDIUM":
+        reinforceSpeed = 5000
+
+    reinforcements = cfg.respawnWaves[curWave]
+    lastReinforceTime = pygame.time.get_ticks()
+
     # enemyFormation is a list of strings representing the enemy formation beginning the fight
     # "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
     enemyFormation = random.choice(cfg.simpleEnemyFormations)
@@ -259,6 +269,11 @@ def beginCombat(difficulty):
                     enemies[selectedCell].health -= player.damage
                     if enemies[selectedCell].health <= 0:
                        enemies[selectedCell] = None
+                       # if the player just killed an enemy and there are no more reinforcements
+                       # the player has beaten the wave
+                       if len(reinforcements) == 0:
+                             #TODO BEAT WAVE
+                            print("winnar winrar")
                 else:
                     print("Whiff!")
                 player.lastAttacked = pygame.time.get_ticks()
@@ -302,6 +317,14 @@ def beginCombat(difficulty):
                         player.takeDamage(e.damage)
                 elif curTime - e.lastAttacked + 500 >= e.speed:
                     e.windUpAnim = True
+
+            # if there is an empty cell, check if it is time for reinforcements
+            # if there are no enemies in the field, send in two (if available)
+            elif len(reinforcements) > 0:
+                if (curTime - lastReinforceTime) > reinforceSpeed:
+                    newEnemy = reinforcements[random.randrange(len(reinforcements))]
+                    enemies[i] = createEnemy(i, newEnemy)
+                    reinforcements.remove(newEnemy)
 
         pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()
