@@ -2,6 +2,7 @@ import pygame
 import combat
 import config as cfg
 import loadAssets as assets
+from sys import exit
 
 # game handler
 
@@ -30,6 +31,8 @@ def mainMenu():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 cfg.RUN_GAME = False
+                pygame.quit()
+                exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     combat.beginCombat(options[menuSelection], 0)
