@@ -21,57 +21,60 @@ def createEnemies(enemyFormation):
         if name == "":
             enemies.append(None)
         else:
-            speed = 0.0
-            dmg = 0
-            sprite = None
-            if i == 0:
-                x = cfg.CANVAS_WIDTH / 4
-                y = cfg.CANVAS_HEIGHT / 4
-            elif i == 1:
-                x = cfg.CANVAS_WIDTH * (3/4)
-                y = cfg.CANVAS_HEIGHT / 4
-            elif i == 2:
-                x = cfg.CANVAS_WIDTH / 4
-                y = cfg.CANVAS_HEIGHT * (3/4)
-            else:
-                x = cfg.CANVAS_WIDTH * (3/4)
-                y = cfg.CANVAS_HEIGHT * (3/4)
-
-            if name == "Samurai":
-                speed = 2300
-                dmg = 7
-                health = 100
-                sprite = assets.samurai_sprite_idle1
-                sprite = pygame.transform.scale(sprite, (75, 100))
-                idleSprites = [assets.samurai_sprite_idle1, assets.samurai_sprite_idle2]
-                attackSprite = assets.samurai_sprite_attack
-                windupSprite = assets.oni_sprite_windup
-            elif name == "Ninja":
-                speed = 1800
-                dmg = 3
-                health = 100
-                sprite = assets.ninja_sprite_idle1
-                idleSprites = [assets.ninja_sprite_idle1, assets.ninja_sprite_idle2]
-                attackSprite = assets.ninja_sprite_attack
-                windupSprite = assets.ninja_sprite_windup
-            elif name == "Oni":
-                speed = 2800
-                dmg = 10
-                health = 100
-                sprite = assets.oni_sprite_idle1
-                idleSprites = [assets.oni_sprite_idle1, assets.oni_sprite_idle2]
-                attackSprite = assets.oni_sprite_attack
-                windupSprite = assets.oni_sprite_windup
-
-            # adjust the enemy's location based on it's image
-            # so it's location will be centered to the center of the actual sprite
-            #x -= sprite.get_rect().width / 2
-            x -= 65
-            y -= 90
-
-            print(str(x) + " " + str(y))
-            enemies.append(enemy_class.Enemy(name, health, x, y, dmg, speed, sprite, idleSprites, attackSprite, windupSprite))
+            e = createEnemy(i, name)
+            enemies.append(e)
     return enemies
+
+def createEnemy(cell,name):
+    if cell == 0:
+        x = cfg.CANVAS_WIDTH / 4
+        y = cfg.CANVAS_HEIGHT / 4
+    elif cell == 1:
+        x = cfg.CANVAS_WIDTH * (3 / 4)
+        y = cfg.CANVAS_HEIGHT / 4
+    elif cell == 2:
+        x = cfg.CANVAS_WIDTH / 4
+        y = cfg.CANVAS_HEIGHT * (3 / 4)
+    else:
+        x = cfg.CANVAS_WIDTH * (3 / 4)
+        y = cfg.CANVAS_HEIGHT * (3 / 4)
+
+    if name == "Samurai":
+        speed = 2700
+        dmg = 5
+        health = 100
+        idleSprites = [assets.samurai_sprite_idle1, assets.samurai_sprite_idle2]
+        attackSprite = assets.samurai_sprite_attack
+        windupSprite = assets.oni_sprite_windup
+    elif name == "Ninja":
+        speed = 2200
+        dmg = 2
+        health = 100
+        idleSprites = [assets.ninja_sprite_idle1, assets.ninja_sprite_idle2]
+        attackSprite = assets.ninja_sprite_attack
+        windupSprite = assets.ninja_sprite_windup
+    elif name == "Oni":
+        speed = 3200
+        dmg = 7
+        health = 100
+        idleSprites = [assets.oni_sprite_idle1, assets.oni_sprite_idle2]
+        attackSprite = assets.oni_sprite_attack
+        windupSprite = assets.oni_sprite_windup
+
+    # adjust the enemy's location based on it's image
+    # so it's location will be centered to the center of the actual sprite
+    # x -= sprite.get_rect().width / 2
+    # different visual placement for enemies on left vs right
+    if cell % 2:
+        x -= 30
+    else:
+        x -= 100
+    if cell > 1:
+        y -= 50
+    else:
+        y -= 80
+
+    return enemy_class.Enemy(name, health, x, y, dmg, speed, random.randrange(1000), idleSprites, attackSprite,windupSprite)
 
 def drawScreen(selectedCell, enemies):
     cfg.screen.fill((255, 255, 255))
@@ -167,7 +170,7 @@ def drawScreen(selectedCell, enemies):
                 e.lastAnim = curTime
             cfg.screen.blit(e.sprite, (e.xPos, e.yPos))
 
-            healthRect = pygame.Rect(e.xPos + 10, e.yPos + e.sprite.get_rect().height + 5, e.health, 10)
+            healthRect = pygame.Rect(e.xPos + 40, e.yPos + e.sprite.get_rect().height + 5, e.health, 10)
             healthColor = (0,255,0)
             if e.health < 33:
                 healthColor = (255,0,0)
@@ -250,7 +253,8 @@ def beginCombat(difficulty):
                     player.sprite = assets.player_chop
                 elif player.action == "headbutt":
                     player.sprite = assets.player_headbutt
-                    enemies[selectedCell].lastAttacked = pygame.time.get_ticks()
+                    if enemies[selectedCell] is not None:
+                        enemies[selectedCell].lastAttacked = pygame.time.get_ticks()
                 if enemies[selectedCell] is not None:
                     enemies[selectedCell].health -= player.damage
                     if enemies[selectedCell].health <= 0:
@@ -283,7 +287,7 @@ def beginCombat(difficulty):
                     # if the player is blocking and out of stamina, they take full damage
                     # otherwise they will take stamina damage
                     if player.action == "defend":
-                        if player.stamina > 0:
+                        if player.stamina > 10:
                             player.reduceStam(e.damage)
                             # player hit their parry, give them a second long riposte window
                             if (curTime - player.parryStart) <= player.parryWindow:

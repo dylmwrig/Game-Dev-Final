@@ -48,7 +48,7 @@ enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninjaAttac
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninjaWindup.png')))
 
 for i,img in enumerate(enemySprites):
-    img = pygame.transform.scale(img, (150, 150))
+    img = pygame.transform.scale(img, (180, 180))
     enemySprites[i] = img
 
 samurai_sprite_idle1 = enemySprites[0]

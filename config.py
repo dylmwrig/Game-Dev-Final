@@ -27,3 +27,5 @@ cursor_drawn = False
 
 # easy enemy formations, use these in the beginning
 simpleEnemyFormations = [["Samurai", "Oni", "", "Ninja"]]
+
+waveOneRespawnWaves = ["Samurai", "Oni", "Ninja"]

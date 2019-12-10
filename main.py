@@ -25,7 +25,7 @@ def main():
             else:
                 color = (255, 255, 255)
             text = assets.menuOptionsFont.render(option, False, color)
-            cfg.screen.blit(text, ((titleRect.right / 2), titleRect.bottom + ((i + 1) * 50)))
+            cfg.screen.blit(text, (round((titleRect.right / 2)), titleRect.bottom + ((i + 1) * 50)))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

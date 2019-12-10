@@ -99,7 +99,7 @@ class Player:
                 self.lastAttacked = pygame.time.get_ticks()
                 if self.action == "punch":
                     self.actionName = "punch"
-                    self.damage = 30
+                    self.damage = 25
                     self.speed = 1500
                     self.stamCost = 10
                     #self.spriteArr = punchFrames
@@ -108,12 +108,14 @@ class Player:
                     self.actionName = "chop"
                     self.damage = 10
                     self.speed = 500
+                    self.stamCost = 10
                     #self.spriteArr = chopFrames
                     self.actionIcon = self.actionIcons[2]
                 if self.action == "headbutt":
                     self.actionName = "hedbut"
-                    self.damage = 50
-                    self.speed = 2500
+                    self.damage = 25
+                    self.speed = 2000
+                    self.stamCost = 20
                     self.actionIcon = self.actionIcons[3]
 
                 if (pygame.time.get_ticks() - self.riposteStart) < self.riposteWindow:
