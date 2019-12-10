@@ -212,7 +212,15 @@ def beginCombat(difficulty, curWave):
     elif difficulty == "HARD":
         reinforceSpeed = 5000
 
-    reinforcements = cfg.respawnWaves[curWave]
+    # populate reinforcements array based on wave count
+    # filling in order doesn't matter since they're accessed randomly
+    reinforcements = []
+    i = 0
+    while i < (curWave + 1):
+        reinforcements.append("Samurai")
+        reinforcements.append("Oni")
+        reinforcements.append("Ninja")
+        i += 1
     lastReinforceTime = pygame.time.get_ticks()
 
     # enemyFormation is a list of strings representing the enemy formation beginning the fight
@@ -356,12 +364,25 @@ def beginCombat(difficulty, curWave):
             #elif len(reinforcements) > 0:
             if (curTime - lastReinforceTime) > reinforceSpeed:
                 lastReinforceTime = pygame.time.get_ticks()
+                enemyCount = 0
                 for i,e in enumerate(enemies):
                     if e is None:
                         if (len(reinforcements) > 0):
                             newEnemy = reinforcements[random.randrange(len(reinforcements))]
                             enemies[i] = createEnemy(i, newEnemy)
                             reinforcements.remove(newEnemy)
+                            enemyCount += 1
+                            break
+                    else:
+                        enemyCount += 1
+                #meh
+                for i,e in enumerate(enemies):
+                    if enemyCount == 1 and len(reinforcements) > 0:
+                        if e is None:
+                            newEnemy = reinforcements[random.randrange(len(reinforcements))]
+                            enemies[i] = createEnemy(i, newEnemy)
+                            reinforcements.remove(newEnemy)
+                            enemyCount += 1
                             break
 
         #t = reinforceSpeed - curTime - lastReinforceTime
