@@ -65,5 +65,6 @@ ninja_sprite_windup = enemySprites[10]
 
 menuTitleFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 60)
 menuOptionsFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 40)
+generalInfoFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 34)
 actionFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 27)
 stamHealthFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 20)

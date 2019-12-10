@@ -11,6 +11,7 @@ CURSOR_BLIT_SPEED = 300
 CHAR_ANIM_SPEED = 600
 
 player = player_class.Player(0)
+curWave = 0
 
 # four element list holding each enemy
 # first element corresponds to enemy in top left cell, second to top right, and so on
@@ -68,7 +69,7 @@ def createEnemy(cell,name):
     if cell % 2:
         x -= 30
     else:
-        x -= 100
+        x -= 130
     if cell > 1:
         y -= 50
     else:
@@ -76,7 +77,7 @@ def createEnemy(cell,name):
 
     return enemy_class.Enemy(name, health, x, y, dmg, speed, random.randrange(1000), idleSprites, attackSprite,windupSprite)
 
-def drawScreen(selectedCell, enemies):
+def drawScreen(selectedCell, enemies, reinforcementsLeft, reinforcementsTimer):
     cfg.screen.fill((255, 255, 255))
 
     pygame.draw.line(cfg.screen, (0, 0, 0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
@@ -112,6 +113,21 @@ def drawScreen(selectedCell, enemies):
             player.bgAlpha = 255
             player.bgColor = (255,255,255)
             player.bgAnimating = False
+
+    cfg.screen.fill((255,255,255), cfg.generalInfoArea)
+    text = "Wave Number " + str(curWave + 1)
+    textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
+    cfg.screen.blit(textDisplay,cfg.waveNumArea)
+    text = str(reinforcementsLeft) + " More Enemies"
+    textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
+    cfg.screen.blit(textDisplay,cfg.wavesLeftArea)
+    # hopefully I can implement the timer but for now I should focus on other stuff
+    #text = str(reinforcementsTimer / 1000) + " Seconds"
+    #textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
+    #cfg.screen.blit(textDisplay,cfg.waveTimerArea1)
+    #text = "Until Reinforcements"
+    #textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
+    #cfg.screen.blit(textDisplay,cfg.waveTimerArea2)
 
     if cfg.cursor_drawn:
         cfg.screen.blit(assets.selector_img, cfg.quadrants[selectedCell])
@@ -182,8 +198,6 @@ def drawScreen(selectedCell, enemies):
 # difficulty effects reinforcement speed
 def beginCombat(difficulty):
     pygame.init()
-
-    curWave = 0
 
     if difficulty == "EASY":
         reinforceSpeed = 10000
@@ -320,12 +334,16 @@ def beginCombat(difficulty):
 
             # if there is an empty cell, check if it is time for reinforcements
             # if there are no enemies in the field, send in two (if available)
-            elif len(reinforcements) > 0:
-                if (curTime - lastReinforceTime) > reinforceSpeed:
-                    newEnemy = reinforcements[random.randrange(len(reinforcements))]
-                    enemies[i] = createEnemy(i, newEnemy)
-                    reinforcements.remove(newEnemy)
+            #elif len(reinforcements) > 0:
+            if (curTime - lastReinforceTime) > reinforceSpeed:
+                lastReinforceTime = pygame.time.get_ticks()
+                for i,e in enumerate(enemies):
+                    if e is None:
+                        newEnemy = reinforcements[random.randrange(len(reinforcements))]
+                        enemies[i] = createEnemy(i, newEnemy)
+                        reinforcements.remove(newEnemy)
 
+        t = reinforceSpeed - curTime - lastReinforceTime
         pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()
-        drawScreen(selectedCell, enemies)
+        drawScreen(selectedCell, enemies, len(reinforcements), t)
