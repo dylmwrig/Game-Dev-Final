@@ -32,7 +32,7 @@ def main():
                 cfg.RUN_GAME = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    combat.beginCombat(options[menuSelection])
+                    combat.beginCombat(options[menuSelection], 0)
                 if event.key == pygame.K_UP:
                     if menuSelection == 0:
                         menuSelection = len(options) - 1

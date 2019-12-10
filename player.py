@@ -57,6 +57,7 @@ class Player:
         self.sprite = assets.player_idle1
         self.spriteArr = self.idleSprites
         self.animIndex = 0
+        self.killCount = 0
     # for each string in the equipment array, alter the player's stats
     # call this when combat starts
     # should be cleaner than directly buffing stats, allows for more flexibility

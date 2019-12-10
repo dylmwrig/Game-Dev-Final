@@ -4,6 +4,8 @@ import loadAssets as assets
 import config as cfg
 import player as player_class
 import enemy as enemy_class
+from sys import exit
+from time import sleep
 
 #def playerTakeAction(action):
 
@@ -11,7 +13,6 @@ CURSOR_BLIT_SPEED = 300
 CHAR_ANIM_SPEED = 600
 
 player = player_class.Player(0)
-curWave = 0
 numKilled = 0
 
 # four element list holding each enemy
@@ -75,7 +76,7 @@ def createEnemy(cell,name):
 
     return enemy_class.Enemy(name, health, x, y, dmg, speed, random.randrange(1000), idleSprites, attackSprite,windupSprite)
 
-def drawScreen(selectedCell, enemies, reinforcementsLeft, reinforcementsTimer):
+def drawScreen(selectedCell, enemies, reinforcementsLeft, curWave, waveComplete):
     cfg.screen.fill((255, 255, 255))
 
     pygame.draw.line(cfg.screen, (0, 0, 0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
@@ -119,9 +120,13 @@ def drawScreen(selectedCell, enemies, reinforcementsLeft, reinforcementsTimer):
     text = str(reinforcementsLeft) + " More Enemies"
     textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
     cfg.screen.blit(textDisplay,cfg.wavesLeftArea)
-    text = "Killed " + str(numKilled) + " enemies"
+    text = "Killed " + str(player.killCount)
     textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
-    cfg.screen.blit(textDisplay,cfg.wavesLeftArea)
+    cfg.screen.blit(textDisplay,cfg.killCountArea)
+    if waveComplete:
+        text = "Press Enter"
+        textDisplay = assets.generalInfoFont.render(text, False, (0, 0, 0))
+        cfg.screen.blit(textDisplay, cfg.waveCompleteArea)
     # hopefully I can implement the timer but for now I should focus on other stuff
     #text = str(reinforcementsTimer / 1000) + " Seconds"
     #textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
@@ -197,7 +202,7 @@ def drawScreen(selectedCell, enemies, reinforcementsLeft, reinforcementsTimer):
 
 # basic fight loop
 # difficulty effects reinforcement speed
-def beginCombat(difficulty):
+def beginCombat(difficulty, curWave):
     pygame.init()
 
     if difficulty == "EASY":
@@ -207,11 +212,6 @@ def beginCombat(difficulty):
     elif difficulty == "HARD":
         reinforceSpeed = 5000
 
-    keepGoing = True
-    while keepGoing:
-        keepGoing = continueFight(reinforceSpeed)
-
-def continueFight(reinforceSpeed):
     reinforcements = cfg.respawnWaves[curWave]
     lastReinforceTime = pygame.time.get_ticks()
 
@@ -222,6 +222,7 @@ def continueFight(reinforceSpeed):
 
     continueFight = True
     returnVal = True
+    waveComplete = False
 
     # selectedCell represents where the player is currently targeting
     # 0 represents top left, 1 is top right, 2 is bottom left, 3 is bottom right
@@ -234,7 +235,8 @@ def continueFight(reinforceSpeed):
             if event.type == pygame.QUIT:
                 continueFight = False
                 cfg.RUN_GAME = False
-                returnVal = False
+                pygame.quit()
+                exit()
 
             # cell targeting selection by the player
             # if the player moves towards the edge, wrap
@@ -260,7 +262,10 @@ def continueFight(reinforceSpeed):
                     else:
                         selectedCell += 2
 
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_RETURN:
+                    if waveComplete:
+                        continueFight = False
+                elif event.key == pygame.K_SPACE:
                     player.takeAction("defend")
                 elif event.key == pygame.K_a:
                     player.takeAction("punch")
@@ -277,7 +282,6 @@ def continueFight(reinforceSpeed):
         # player actions
         if (curTime - player.lastAttacked) > player.speed:
             if player.damage > 0:
-                print(player.action)
                 player.curAnimating = True
                 player.startAnim = pygame.time.get_ticks()
                 if player.action == "punch":
@@ -291,12 +295,18 @@ def continueFight(reinforceSpeed):
                 if enemies[selectedCell] is not None:
                     enemies[selectedCell].health -= player.damage
                     if enemies[selectedCell].health <= 0:
-                       enemies[selectedCell] = None
-                       # if the player just killed an enemy and there are no more reinforcements
-                       # the player has beaten the wave
-                       if len(reinforcements) == 0:
-                             #TODO BEAT WAVE
-                            print("winnar winrar")
+                        player.killCount += 1
+                        enemies[selectedCell] = None
+                        # if the player just killed an enemy and there are no more reinforcements
+                        # the player has beaten the wave
+                        if len(reinforcements) == 0:
+                            enemiesLeft = False
+                            for e in enemies:
+                                if e is not None:
+                                    enemiesLeft = True
+
+                            if enemiesLeft == False:
+                                waveComplete = True
                 else:
                     print("Whiff!")
                 player.lastAttacked = pygame.time.get_ticks()
@@ -354,11 +364,10 @@ def continueFight(reinforceSpeed):
                             reinforcements.remove(newEnemy)
                             break
 
-        t = reinforceSpeed - curTime - lastReinforceTime
+        #t = reinforceSpeed - curTime - lastReinforceTime
         pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()
-        drawScreen(selectedCell, enemies, len(reinforcements), t)
+        drawScreen(selectedCell, enemies, len(reinforcements), curWave, waveComplete)
 
-    if player.action == "die":
-        returnVal = False
-    return returnVal
+    if player.action != "die":
+        beginCombat(difficulty, curWave + 1)
