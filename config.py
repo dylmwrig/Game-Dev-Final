@@ -14,12 +14,11 @@ playerInfoBarRect = pygame.Rect(playerArea.left, playerArea.bottom - 60, playerA
 actionTextRect = pygame.Rect(playerArea.left, playerInfoBarRect.top + 1, 40, 40)
 playerHealthRect = pygame.Rect(playerArea.right - 101, playerInfoBarRect.top + 1, 100, 15)
 
-
 generalInfoArea = pygame.Rect(playerArea.left, playerArea.top - (CANVAS_HEIGHT / 4), playerArea.width, CANVAS_HEIGHT / 4)
 waveNumArea = pygame.Rect(generalInfoArea.left, generalInfoArea.top, generalInfoArea.width, generalInfoArea.height / 4)
 wavesLeftArea = pygame.Rect(generalInfoArea.left, waveNumArea.bottom, generalInfoArea.width, generalInfoArea.height / 4)
-waveTimerArea1 = pygame.Rect(generalInfoArea.left, wavesLeftArea.bottom, generalInfoArea.width, generalInfoArea.height / 4)
-waveTimerArea2 = pygame.Rect(generalInfoArea.left, waveTimerArea1.bottom, generalInfoArea.width, generalInfoArea.height / 4)
+killCountArea = pygame.Rect(generalInfoArea.left, wavesLeftArea.bottom, generalInfoArea.width, generalInfoArea.height / 4)
+waveCompleteArea = pygame.Rect(generalInfoArea.left, killCountArea.bottom, generalInfoArea.width, generalInfoArea.height / 4)
 
 playerBorder = pygame.Rect(playerArea.left - 2, generalInfoArea.top - 2, playerArea.width + 4, playerArea.height + generalInfoArea.height + 4)
 playerStamRect = pygame.Rect(playerArea.right - 101, playerBorder.bottom - 32, 100, 15)
@@ -34,10 +33,13 @@ cursor_last_blit = pygame.time.get_ticks()
 cursor_drawn = False
 
 # easy enemy formations, use these in the beginning
-simpleEnemyFormations = [["Samurai", "Oni", "", "Ninja"]]
+startingFormations = [["Samurai", "", "", "Ninja"],
+                         ["", "Oni", "", "Samurai"],
+                         ["Ninja", "", "Oni", ""],
+                         ["","Oni","Samurai",""]]
 
 # each list represents all reinforcements for a given wave
 # ie respawnWaves [1] contains all reinforcements for wave 2
 # elements selected from list randomly so ordering doesn't matter
-respawnWaves = [["Samurai", "Oni", "Ninja"],
+respawnWaves = [[],#["Samurai", "Oni", "Ninja"],
                 []]

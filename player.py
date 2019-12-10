@@ -104,7 +104,7 @@ class Player:
                 self.lastAttacked = pygame.time.get_ticks()
                 if self.action == "punch":
                     self.actionName = "punch"
-                    self.damage = 25
+                    self.damage = 35
                     self.speed = 1500
                     self.stamCost = 10
                     self.actionIcon = self.actionIcons[1]
@@ -116,7 +116,7 @@ class Player:
                     self.actionIcon = self.actionIcons[2]
                 if self.action == "headbutt":
                     self.actionName = "hedbut"
-                    self.damage = 25
+                    self.damage = 35
                     self.speed = 2000
                     self.stamCost = 20
                     self.actionIcon = self.actionIcons[3]

@@ -12,6 +12,7 @@ CHAR_ANIM_SPEED = 600
 
 player = player_class.Player(0)
 curWave = 0
+numKilled = 0
 
 # four element list holding each enemy
 # first element corresponds to enemy in top left cell, second to top right, and so on
@@ -48,7 +49,7 @@ def createEnemy(cell,name):
         attackSprite = assets.samurai_sprite_attack
         windupSprite = assets.samurai_sprite_windup
     elif name == "Ninja":
-        speed = 2200
+        speed = 1800
         dmg = 2
         health = 100
         idleSprites = [assets.ninja_sprite_idle1, assets.ninja_sprite_idle2]
@@ -62,9 +63,6 @@ def createEnemy(cell,name):
         attackSprite = assets.oni_sprite_attack
         windupSprite = assets.oni_sprite_windup
 
-    # adjust the enemy's location based on it's image
-    # so it's location will be centered to the center of the actual sprite
-    # x -= sprite.get_rect().width / 2
     # different visual placement for enemies on left vs right
     if cell % 2:
         x -= 30
@@ -119,6 +117,9 @@ def drawScreen(selectedCell, enemies, reinforcementsLeft, reinforcementsTimer):
     textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
     cfg.screen.blit(textDisplay,cfg.waveNumArea)
     text = str(reinforcementsLeft) + " More Enemies"
+    textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
+    cfg.screen.blit(textDisplay,cfg.wavesLeftArea)
+    text = "Killed " + str(numKilled) + " enemies"
     textDisplay = assets.generalInfoFont.render(text, False, (0,0,0))
     cfg.screen.blit(textDisplay,cfg.wavesLeftArea)
     # hopefully I can implement the timer but for now I should focus on other stuff
@@ -200,20 +201,27 @@ def beginCombat(difficulty):
     pygame.init()
 
     if difficulty == "EASY":
-        reinforceSpeed = 10000
+        reinforceSpeed = 15000
     elif difficulty == "MEDIUM":
+        reinforceSpeed = 10000
+    elif difficulty == "HARD":
         reinforceSpeed = 5000
 
+    keepGoing = True
+    while keepGoing:
+        keepGoing = continueFight(reinforceSpeed)
+
+def continueFight(reinforceSpeed):
     reinforcements = cfg.respawnWaves[curWave]
     lastReinforceTime = pygame.time.get_ticks()
 
     # enemyFormation is a list of strings representing the enemy formation beginning the fight
     # "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
-    enemyFormation = random.choice(cfg.simpleEnemyFormations)
+    enemyFormation = random.choice(cfg.startingFormations)
     enemies = createEnemies(enemyFormation)
-    start_ticks = pygame.time.get_ticks()
 
     continueFight = True
+    returnVal = True
 
     # selectedCell represents where the player is currently targeting
     # 0 represents top left, 1 is top right, 2 is bottom left, 3 is bottom right
@@ -226,6 +234,7 @@ def beginCombat(difficulty):
             if event.type == pygame.QUIT:
                 continueFight = False
                 cfg.RUN_GAME = False
+                returnVal = False
 
             # cell targeting selection by the player
             # if the player moves towards the edge, wrap
@@ -300,7 +309,7 @@ def beginCombat(difficulty):
             if player.action == "meditating":
                 print("Meditating")
             else:
-                player.increaseStam(5)
+                player.increaseStam(10)
 
         # each enemy starts with lastAttacked = -1.0
         # start their attack cycle once we are in the game loop
@@ -339,11 +348,17 @@ def beginCombat(difficulty):
                 lastReinforceTime = pygame.time.get_ticks()
                 for i,e in enumerate(enemies):
                     if e is None:
-                        newEnemy = reinforcements[random.randrange(len(reinforcements))]
-                        enemies[i] = createEnemy(i, newEnemy)
-                        reinforcements.remove(newEnemy)
+                        if (len(reinforcements) > 0):
+                            newEnemy = reinforcements[random.randrange(len(reinforcements))]
+                            enemies[i] = createEnemy(i, newEnemy)
+                            reinforcements.remove(newEnemy)
+                            break
 
         t = reinforceSpeed - curTime - lastReinforceTime
         pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()
         drawScreen(selectedCell, enemies, len(reinforcements), t)
+
+    if player.action == "die":
+        returnVal = False
+    return returnVal
