@@ -5,11 +5,13 @@ import config as cfg
 # player class
 # equipment is an array which will hold all of the player's powerups
 class Player:
-    def __init__(self, equipment):
+    def __init__(self):
         self.health = 100
         self.stamina = 100
         self.healthColor = (0,255,0)
-        self.equipment = equipment
+
+        cfg.playerHealthRect.width = self.health
+        cfg.playerStamRect.width = self.stamina
 
         # action name is displayed; needs to be its own var as headbutt is too long to display
         self.action = "idle"
@@ -101,7 +103,7 @@ class Player:
                     self.action = "defendNoStam"
                     self.actionName = "no stam"
                     self.actionIcon = self.actionIcons[5]
-            else:
+            elif self.stamina >= 10:
                 self.lastAttacked = pygame.time.get_ticks()
                 if self.action == "punch":
                     self.actionName = "punch"

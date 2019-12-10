@@ -1,5 +1,6 @@
 import random
 import pygame
+import main
 import loadAssets as assets
 import config as cfg
 import player as player_class
@@ -11,9 +12,6 @@ from time import sleep
 
 CURSOR_BLIT_SPEED = 300
 CHAR_ANIM_SPEED = 600
-
-player = player_class.Player(0)
-numKilled = 0
 
 # four element list holding each enemy
 # first element corresponds to enemy in top left cell, second to top right, and so on
@@ -76,7 +74,7 @@ def createEnemy(cell,name):
 
     return enemy_class.Enemy(name, health, x, y, dmg, speed, random.randrange(1000), idleSprites, attackSprite,windupSprite)
 
-def drawScreen(selectedCell, enemies, reinforcementsLeft, curWave, waveComplete):
+def drawScreen(player, selectedCell, enemies, reinforcementsLeft, curWave, waveComplete):
     cfg.screen.fill((255, 255, 255))
 
     pygame.draw.line(cfg.screen, (0, 0, 0), (cfg.CANVAS_WIDTH / 2, 0), (cfg.CANVAS_WIDTH / 2, cfg.CANVAS_HEIGHT), 10)
@@ -205,12 +203,15 @@ def drawScreen(selectedCell, enemies, reinforcementsLeft, curWave, waveComplete)
 def beginCombat(difficulty, curWave):
     pygame.init()
 
+    player = player_class.Player()
+    numKilled = 0
+
     if difficulty == "EASY":
         reinforceSpeed = 15000
     elif difficulty == "MEDIUM":
-        reinforceSpeed = 10000
+        reinforceSpeed = 11000
     elif difficulty == "HARD":
-        reinforceSpeed = 5000
+        reinforceSpeed = 8000
 
     # populate reinforcements array based on wave count
     # filling in order doesn't matter since they're accessed randomly
@@ -273,6 +274,9 @@ def beginCombat(difficulty, curWave):
                 if event.key == pygame.K_RETURN:
                     if waveComplete:
                         continueFight = False
+                if event.key == pygame.K_ESCAPE:
+                    continueFight = False
+                    main.mainMenu()
                 elif event.key == pygame.K_SPACE:
                     player.takeAction("defend")
                 elif event.key == pygame.K_a:
@@ -327,7 +331,7 @@ def beginCombat(difficulty, curWave):
             if player.action == "meditating":
                 print("Meditating")
             else:
-                player.increaseStam(10)
+                player.increaseStam(7)
 
         # each enemy starts with lastAttacked = -1.0
         # start their attack cycle once we are in the game loop
@@ -364,31 +368,28 @@ def beginCombat(difficulty, curWave):
             #elif len(reinforcements) > 0:
             if (curTime - lastReinforceTime) > reinforceSpeed:
                 lastReinforceTime = pygame.time.get_ticks()
-                enemyCount = 0
                 for i,e in enumerate(enemies):
                     if e is None:
                         if (len(reinforcements) > 0):
                             newEnemy = reinforcements[random.randrange(len(reinforcements))]
                             enemies[i] = createEnemy(i, newEnemy)
                             reinforcements.remove(newEnemy)
-                            enemyCount += 1
                             break
-                    else:
+                enemyCount = 0
+                for e in enemies:
+                    if e is not None:
                         enemyCount += 1
-                #meh
-                for i,e in enumerate(enemies):
-                    if enemyCount == 1 and len(reinforcements) > 0:
-                        if e is None:
+                if enemyCount == 1:
+                    for i,e in enumerate(enemies):
+                        if e is None and len(reinforcements) > 0:
                             newEnemy = reinforcements[random.randrange(len(reinforcements))]
                             enemies[i] = createEnemy(i, newEnemy)
                             reinforcements.remove(newEnemy)
-                            enemyCount += 1
-                            break
 
         #t = reinforceSpeed - curTime - lastReinforceTime
         pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()
-        drawScreen(selectedCell, enemies, len(reinforcements), curWave, waveComplete)
+        drawScreen(player, selectedCell, enemies, len(reinforcements), curWave, waveComplete)
 
     if player.action != "die":
         beginCombat(difficulty, curWave + 1)

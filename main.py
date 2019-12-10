@@ -5,7 +5,7 @@ import loadAssets as assets
 
 # game handler
 
-def main():
+def mainMenu():
     pygame.init()
     # title and icon
     pygame.display.set_caption("Kung Fu Escape")
@@ -47,4 +47,4 @@ def main():
         pygame.display.update()
 
 if __name__ == "__main__":
-    main()
+    mainMenu()
