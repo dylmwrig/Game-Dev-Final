@@ -278,18 +278,20 @@ def beginCombat(difficulty, curWave):
                     continueFight = False
                     main.mainMenu()
                 elif event.key == pygame.K_SPACE:
-                    player.takeAction("defend")
+                    if player.stamina >= 10:
+                        player.takeAction("defend")
                 elif event.key == pygame.K_a:
-                    player.takeAction("punch")
+                    if player.stamina >= 10:
+                        player.takeAction("punch")
                 elif event.key == pygame.K_s:
-                    player.takeAction("chop")
+                    if player.stamina >= 10:
+                        player.takeAction("chop")
                 elif event.key == pygame.K_d:
-                    player.takeAction("headbutt")
+                    if player.stamina >= 10:
+                        player.takeAction("headbutt")
                 #elif event.key == pygame.K_q:
                 #    player.takeAction("meditate")
                 # allows the player to go in and out of defense for parries
-                elif event.key == pygame.K_SPACE:
-                    player.takeAction("defend")
 
         # player actions
         if (curTime - player.lastAttacked) > player.speed:
