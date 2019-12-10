@@ -37,27 +37,30 @@ def createEnemies(enemyFormation):
                 y = cfg.CANVAS_HEIGHT * (3/4)
 
             if name == "Samurai":
-                speed = 2000
-                dmg = 10
+                speed = 2300
+                dmg = 7
                 health = 100
                 sprite = assets.samurai_sprite_idle1
                 sprite = pygame.transform.scale(sprite, (75, 100))
                 idleSprites = [assets.samurai_sprite_idle1, assets.samurai_sprite_idle2]
                 attackSprite = assets.samurai_sprite_attack
+                windupSprite = assets.oni_sprite_windup
             elif name == "Ninja":
-                speed = 1500
-                dmg = 5
+                speed = 1800
+                dmg = 3
                 health = 100
                 sprite = assets.ninja_sprite_idle1
                 idleSprites = [assets.ninja_sprite_idle1, assets.ninja_sprite_idle2]
                 attackSprite = assets.ninja_sprite_attack
+                windupSprite = idleSprites[1] # ninja is so fast he doesn't need a wind up
             elif name == "Oni":
-                speed = 2500
-                dmg = 15
+                speed = 2800
+                dmg = 10
                 health = 100
                 sprite = assets.oni_sprite_idle1
                 idleSprites = [assets.oni_sprite_idle1, assets.oni_sprite_idle2]
                 attackSprite = assets.oni_sprite_attack
+                windupSprite = assets.oni_sprite_windup
 
             # adjust the enemy's location based on it's image
             # so it's location will be centered to the center of the actual sprite
@@ -66,7 +69,7 @@ def createEnemies(enemyFormation):
             y -= 90
 
             print(str(x) + " " + str(y))
-            enemies.append(enemy_class.Enemy(name, health, x, y, dmg, speed, sprite, idleSprites, attackSprite))
+            enemies.append(enemy_class.Enemy(name, health, x, y, dmg, speed, sprite, idleSprites, attackSprite, windupSprite))
     return enemies
 
 def drawScreen(selectedCell, enemies):
@@ -110,9 +113,12 @@ def drawScreen(selectedCell, enemies):
         cfg.screen.blit(assets.selector_img, cfg.quadrants[selectedCell])
     cfg.screen.blit(player.sprite, (cfg.playerArea.left + 40, cfg.playerArea.top - 15))
 
-    if (curTime - player.charLastAnim) > CHAR_ANIM_SPEED:
-        player.charLastAnim = pygame.time.get_ticks()
-        player.updateSprite()
+    if not player.curAnimating:
+        if (curTime - player.charLastAnim) > CHAR_ANIM_SPEED:
+            player.charLastAnim = pygame.time.get_ticks()
+            player.updateSprite()
+    elif (curTime - player.startAnim) > 500:
+        player.curAnimating = False
 
     pygame.draw.rect(cfg.screen, (0, 0, 0), cfg.playerInfoBarRect)
     if player.action == "idle":
@@ -150,6 +156,9 @@ def drawScreen(selectedCell, enemies):
                 # attack animation has completed
                 else:
                     e.attackAnimTime = -1
+
+            elif e.windUpAnim:
+                e.sprite = e.windupSprite
 
             elif (curTime - e.lastAnim) > CHAR_ANIM_SPEED:
                 e.idleIndex = (e.idleIndex + 1) % 2
@@ -228,17 +237,26 @@ def beginCombat(enemyFormation):
 
         # player actions
         if (curTime - player.lastAttacked) > player.speed:
-            if enemies[selectedCell] is not None:
-                if player.damage > 0:
+            if player.damage > 0:
+                print(player.action)
+                player.curAnimating = True
+                player.startAnim = pygame.time.get_ticks()
+                if player.action == "punch":
+                    player.sprite = assets.player_punch
+                elif player.action == "chop":
+                    player.sprite = assets.player_chop
+                elif player.action == "headbutt":
+                    player.sprite = assets.player_headbutt
+                    enemies[selectedCell].lastAttacked = pygame.time.get_ticks()
+                if enemies[selectedCell] is not None:
                     enemies[selectedCell].health -= player.damage
-                    print(enemies[selectedCell].name)
-                    print(enemies[selectedCell].health)
                     if enemies[selectedCell].health <= 0:
                        enemies[selectedCell] = None
-            else:
-                print("Whiff!")
-            player.lastAttacked = pygame.time.get_ticks()
-            player.reduceStam(player.stamCost)
+                else:
+                    print("Whiff!")
+                player.lastAttacked = pygame.time.get_ticks()
+                player.reduceStam(player.stamCost)
+                player.takeAction("idle")
 
         # recharge player stamina
         if (curTime - player.stamLastCharged) > player.stamChargeRate:
@@ -256,6 +274,7 @@ def beginCombat(enemyFormation):
                 if e.lastAttacked == -1.0:
                     e.lastAttacked = curTime
                 elif curTime - e.lastAttacked >= e.speed:
+                    e.windUpAnim = False
                     e.lastAttacked = curTime
                     e.attackAnimTime = curTime
                     # if the player is blocking and out of stamina, they take full damage
@@ -274,6 +293,8 @@ def beginCombat(enemyFormation):
                             player.takeDamage(e.damage)
                     else:
                         player.takeDamage(e.damage)
+                elif curTime - e.lastAttacked + 500 >= e.speed:
+                    e.windUpAnim = True
 
         pygame.time.Clock().tick(cfg.FRAME_RATE)
         pygame.display.update()

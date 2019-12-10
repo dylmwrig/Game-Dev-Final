@@ -25,10 +25,5 @@ quadrants = [cellOne, cellTwo, cellThree, cellFour]
 cursor_last_blit = pygame.time.get_ticks()
 cursor_drawn = False
 
-#linux
-#punch_img = pygame.image.load("/home/fuwafuwatime/PycharmProjects/Game-Dev-Final/assets/punch.png")
-#chop_img = pygame.image.load("/home/fuwafuwatime/PycharmProjects/Game-Dev-Final/assets/chop.png")
-#headbutt_img = pygame.image.load("/home/fuwafuwatime/PycharmProjects/Game-Dev-Final/assets/headbutt.png")
-
 # easy enemy formations, use these in the beginning
-simpleEnemyFormations = [["Samurai", "Samurai", "Samurai", "Samurai"]]
+simpleEnemyFormations = [["Samurai", "Oni", "", "Ninja"]]

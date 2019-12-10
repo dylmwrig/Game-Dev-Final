@@ -8,10 +8,10 @@ pygame.font.init()
 # allows for windows and python development without directory conflicts
 
 cur_dir = Path.cwd()
-print("Cur path? " + str(cur_dir))
-punch_img = pygame.image.load(str(cur_dir/'assets'/'punch.png'))
-chop_img = pygame.image.load(str(cur_dir/'assets'/'chop.png'))
-headbutt_img = pygame.image.load(str(cur_dir/'assets'/'headbutt.png'))
+
+punch_icon = pygame.image.load(str(cur_dir/'assets'/'punch.png'))
+chop_icon = pygame.image.load(str(cur_dir/'assets'/'chop.png'))
+headbutt_icon = pygame.image.load(str(cur_dir/'assets'/'headbutt.png'))
 idle_icon = pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'idle_icon.png'))
 defend_icon = pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'defend.png'))
 defend_no_stam_icon = pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'defendNoStam.png'))
@@ -19,11 +19,20 @@ defend_no_stam_icon = pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/
 selector_img = pygame.image.load(str(cur_dir/'assets'/'selector.png'))
 selector_img = pygame.transform.scale(selector_img, (cfg.quadrants[0].width, cfg.quadrants[0].height))
 
-player_idle1 = pygame.image.load(str(cur_dir/'assets'/'Player'/'player-idle1.png'))
-player_idle2 = pygame.image.load(str(cur_dir/'assets'/'Player'/'player-idle2.png'))
+player_sprites = []
+player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'player-idle1.png')))
+player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'player-idle2.png')))
+player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'punch.png')))
+player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'chop.png')))
 
-player_idle1 = pygame.transform.scale(player_idle1, (round(cfg.CANVAS_WIDTH / 4), round(cfg.CANVAS_HEIGHT / 4)))
-player_idle2 = pygame.transform.scale(player_idle2, (round(cfg.CANVAS_WIDTH / 4), round(cfg.CANVAS_HEIGHT / 4)))
+for i,img in enumerate(player_sprites):
+    player_sprites[i] = pygame.transform.scale(player_sprites[i], (round(cfg.CANVAS_WIDTH / 4), round(cfg.CANVAS_HEIGHT / 4)))
+player_idle1 = player_sprites[0]
+player_idle2 = player_sprites[1]
+player_punch = player_sprites[2]
+player_chop = player_sprites[3]
+player_headbutt = pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'headbutt.png'))
+player_headbutt =  pygame.transform.scale(player_headbutt, (round(cfg.CANVAS_WIDTH / 4), round(cfg.CANVAS_HEIGHT / 4)))
 
 enemySprites = []
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'samurai1.png')))
@@ -32,6 +41,7 @@ enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'samuraiAtt
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'oni1.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'oni2.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'oniAttack.png')))
+enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'oniWindup.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninja1.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninja2.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninjaAttack.png')))
@@ -46,9 +56,10 @@ samurai_sprite_attack = enemySprites[2]
 oni_sprite_idle1 = enemySprites[3]
 oni_sprite_idle2 = enemySprites[4]
 oni_sprite_attack = enemySprites[5]
-ninja_sprite_idle1 = enemySprites[6]
-ninja_sprite_idle2 = enemySprites[7]
-ninja_sprite_attack = enemySprites[8]
+oni_sprite_windup = enemySprites[6]
+ninja_sprite_idle1 = enemySprites[7]
+ninja_sprite_idle2 = enemySprites[8]
+ninja_sprite_attack = enemySprites[9]
 
 actionFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 27)
 stamHealthFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 20)

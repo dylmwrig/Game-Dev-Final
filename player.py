@@ -22,6 +22,10 @@ class Player:
         self.lastAttacked = 0
         self.charLastAnim = pygame.time.get_ticks()
 
+        # keeps track of if the player is using a special sprite ie punching
+        self.curAnimating = False
+        self.startAnim = 0
+
         self.parryStart = 0
         self.riposteStart = 0
         self.parryWindow = 500
@@ -39,7 +43,7 @@ class Player:
         self.bgAnimSpeed = 10 # num to subtract from alpha at each step; increase for faster anim
 
         # icon to display in bottom left of player area
-        self.actionIcons = [assets.idle_icon, assets.punch_img, assets.chop_img, assets.headbutt_img,
+        self.actionIcons = [assets.idle_icon, assets.punch_icon, assets.chop_icon, assets.headbutt_icon,
                             assets.defend_icon, assets.defend_no_stam_icon]
         self.actionIcons[0] = pygame.transform.scale(self.actionIcons[0], (80,110))
         self.actionIcons[1] = pygame.transform.scale(self.actionIcons[1], (75,70))
@@ -96,18 +100,20 @@ class Player:
                 if self.action == "punch":
                     self.actionName = "punch"
                     self.damage = 30
-                    self.speed = 2500
+                    self.speed = 1500
                     self.stamCost = 10
                     #self.spriteArr = punchFrames
                     self.actionIcon = self.actionIcons[1]
                 if self.action == "chop":
                     self.actionName = "chop"
                     self.damage = 10
-                    self.speed = 1000
+                    self.speed = 500
                     #self.spriteArr = chopFrames
                     self.actionIcon = self.actionIcons[2]
                 if self.action == "headbutt":
                     self.actionName = "hedbut"
+                    self.damage = 50
+                    self.speed = 2500
                     self.actionIcon = self.actionIcons[3]
 
                 if (pygame.time.get_ticks() - self.riposteStart) < self.riposteWindow:
