@@ -24,6 +24,7 @@ player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'player-id
 player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'player-idle2.png')))
 player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'punch.png')))
 player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'chop.png')))
+player_sprites.append(pygame.image.load(str(cur_dir/'assets'/'Player'/'playerDead.png')))
 
 for i,img in enumerate(player_sprites):
     player_sprites[i] = pygame.transform.scale(player_sprites[i], (round(cfg.CANVAS_WIDTH / 4), round(cfg.CANVAS_HEIGHT / 4)))
@@ -31,6 +32,7 @@ player_idle1 = player_sprites[0]
 player_idle2 = player_sprites[1]
 player_punch = player_sprites[2]
 player_chop = player_sprites[3]
+player_dead = player_sprites[4]
 player_headbutt = pygame.image.load(str(cur_dir/'assets'/'Player'/'actions'/'headbutt.png'))
 player_headbutt =  pygame.transform.scale(player_headbutt, (round(cfg.CANVAS_WIDTH / 4), round(cfg.CANVAS_HEIGHT / 4)))
 
@@ -38,6 +40,7 @@ enemySprites = []
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'samurai1.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'samurai2.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'samuraiAttack.png')))
+enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'samuraiWindup.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'oni1.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'oni2.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'oniAttack.png')))
@@ -54,14 +57,15 @@ for i,img in enumerate(enemySprites):
 samurai_sprite_idle1 = enemySprites[0]
 samurai_sprite_idle2 = enemySprites[1]
 samurai_sprite_attack = enemySprites[2]
-oni_sprite_idle1 = enemySprites[3]
-oni_sprite_idle2 = enemySprites[4]
-oni_sprite_attack = enemySprites[5]
-oni_sprite_windup = enemySprites[6]
-ninja_sprite_idle1 = enemySprites[7]
-ninja_sprite_idle2 = enemySprites[8]
-ninja_sprite_attack = enemySprites[9]
-ninja_sprite_windup = enemySprites[10]
+samurai_sprite_windup = enemySprites[3]
+oni_sprite_idle1 = enemySprites[4]
+oni_sprite_idle2 = enemySprites[5]
+oni_sprite_attack = enemySprites[6]
+oni_sprite_windup = enemySprites[7]
+ninja_sprite_idle1 = enemySprites[8]
+ninja_sprite_idle2 = enemySprites[9]
+ninja_sprite_attack = enemySprites[10]
+ninja_sprite_windup = enemySprites[11]
 
 menuTitleFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 60)
 menuOptionsFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 40)

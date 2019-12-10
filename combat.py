@@ -46,7 +46,7 @@ def createEnemy(cell,name):
         health = 100
         idleSprites = [assets.samurai_sprite_idle1, assets.samurai_sprite_idle2]
         attackSprite = assets.samurai_sprite_attack
-        windupSprite = assets.oni_sprite_windup
+        windupSprite = assets.samurai_sprite_windup
     elif name == "Ninja":
         speed = 2200
         dmg = 2
@@ -133,7 +133,7 @@ def drawScreen(selectedCell, enemies, reinforcementsLeft, reinforcementsTimer):
         cfg.screen.blit(assets.selector_img, cfg.quadrants[selectedCell])
     cfg.screen.blit(player.sprite, (cfg.playerArea.left + 40, cfg.playerArea.top - 15))
 
-    if not player.curAnimating:
+    if not player.action == "die" and not player.curAnimating:
         if (curTime - player.charLastAnim) > CHAR_ANIM_SPEED:
             player.charLastAnim = pygame.time.get_ticks()
             player.updateSprite()

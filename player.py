@@ -74,12 +74,17 @@ class Player:
             # if the player is already defending, go idle, allows for timed parries
             if actionName == "defend":
                 self.takeAction("idle")
-        else:
+        elif self.action != "die":
             self.action = actionName
             if self.action == "idle":
                 self.damage = 0
                 self.actionName = "idle"
                 self.actionIcon = self.actionIcons[0]
+
+            elif self.action == "die":
+                self.damage = 0
+                self.actionName = "dead"
+                self.sprite = assets.player_dead
 
             elif self.action == "defend":
                 self.parryStart = pygame.time.get_ticks()
@@ -102,14 +107,12 @@ class Player:
                     self.damage = 25
                     self.speed = 1500
                     self.stamCost = 10
-                    #self.spriteArr = punchFrames
                     self.actionIcon = self.actionIcons[1]
                 if self.action == "chop":
                     self.actionName = "chop"
                     self.damage = 10
                     self.speed = 500
                     self.stamCost = 10
-                    #self.spriteArr = chopFrames
                     self.actionIcon = self.actionIcons[2]
                 if self.action == "headbutt":
                     self.actionName = "hedbut"
@@ -125,8 +128,7 @@ class Player:
         self.health -= dmg
         cfg.playerHealthRect.width = self.health
         if self.health < 0:
-            #TODO GAME OVER
-            print("You dead")
+            self.takeAction("die")
         elif self.health < 33:
             self.healthColor = (255,0,0)
         elif self.health < 66:
