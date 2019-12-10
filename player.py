@@ -121,7 +121,6 @@ class Player:
 
     def takeDamage(self, dmg):
         self.health -= dmg
-        print("Player health: " + str(self.health))
         cfg.playerHealthRect.width = self.health
         if self.health < 0:
             #TODO GAME OVER

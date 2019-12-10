@@ -1,3 +1,4 @@
+import random
 import pygame
 import loadAssets as assets
 import config as cfg
@@ -52,7 +53,7 @@ def createEnemies(enemyFormation):
                 sprite = assets.ninja_sprite_idle1
                 idleSprites = [assets.ninja_sprite_idle1, assets.ninja_sprite_idle2]
                 attackSprite = assets.ninja_sprite_attack
-                windupSprite = idleSprites[1] # ninja is so fast he doesn't need a wind up
+                windupSprite = assets.ninja_sprite_windup
             elif name == "Oni":
                 speed = 2800
                 dmg = 10
@@ -175,11 +176,13 @@ def drawScreen(selectedCell, enemies):
             pygame.draw.rect(cfg.screen, healthColor, healthRect)
 
 # basic fight loop
-# enemyFormation is a list of strings representing the enemy formation beginning the fight
-# "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
-def beginCombat(enemyFormation):
+# difficulty effects reinforcement speed
+def beginCombat(difficulty):
     pygame.init()
 
+    # enemyFormation is a list of strings representing the enemy formation beginning the fight
+    # "" represents an empty cell. Ie ("","","","Samurai") indicates one samurai at the bottom right cell of the screen
+    enemyFormation = random.choice(cfg.simpleEnemyFormations)
     enemies = createEnemies(enemyFormation)
     start_ticks = pygame.time.get_ticks()
 

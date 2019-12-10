@@ -45,6 +45,7 @@ enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'oniWindup.
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninja1.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninja2.png')))
 enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninjaAttack.png')))
+enemySprites.append(pygame.image.load(str(cur_dir/'assets'/'Enemies'/'ninjaWindup.png')))
 
 for i,img in enumerate(enemySprites):
     img = pygame.transform.scale(img, (150, 150))
@@ -60,6 +61,9 @@ oni_sprite_windup = enemySprites[6]
 ninja_sprite_idle1 = enemySprites[7]
 ninja_sprite_idle2 = enemySprites[8]
 ninja_sprite_attack = enemySprites[9]
+ninja_sprite_windup = enemySprites[10]
 
+menuTitleFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 60)
+menuOptionsFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 40)
 actionFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 27)
 stamHealthFont = pygame.font.Font(str(cur_dir/'assets'/'Fonts'/'ARCADECLASSIC.TTF'), 20)
