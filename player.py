@@ -5,7 +5,7 @@ import config as cfg
 # player class
 # equipment is an array which will hold all of the player's powerups
 class Player:
-    def __init__(self):
+    def __init__(self, numKilled):
         self.health = 100
         self.stamina = 100
         self.healthColor = (0,255,0)
@@ -59,7 +59,7 @@ class Player:
         self.sprite = assets.player_idle1
         self.spriteArr = self.idleSprites
         self.animIndex = 0
-        self.killCount = 0
+        self.killCount = numKilled
     # for each string in the equipment array, alter the player's stats
     # call this when combat starts
     # should be cleaner than directly buffing stats, allows for more flexibility
