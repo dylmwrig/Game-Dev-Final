@@ -200,11 +200,10 @@ def drawScreen(player, selectedCell, enemies, reinforcementsLeft, curWave, waveC
 
 # basic fight loop
 # difficulty effects reinforcement speed
-def beginCombat(difficulty, curWave):
+def beginCombat(difficulty, curWave, numKilled):
     pygame.init()
 
-    player = player_class.Player()
-    numKilled = 0
+    player = player_class.Player(numKilled)
 
     if difficulty == "EASY":
         reinforceSpeed = 15000
@@ -394,4 +393,4 @@ def beginCombat(difficulty, curWave):
         drawScreen(player, selectedCell, enemies, len(reinforcements), curWave, waveComplete)
 
     if player.action != "die":
-        beginCombat(difficulty, curWave + 1)
+        beginCombat(difficulty, curWave + 1, player.killCount)
