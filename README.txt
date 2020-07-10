@@ -1,5 +1,7 @@
 Kung Fu Escape
 
+Final for CSCI 43700, Intro to 3D Game Graphics
+
 Running: install pygame via pip then simply run
 python3 main.py
 
